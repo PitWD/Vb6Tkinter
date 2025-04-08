@@ -1,30 +1,30 @@
 Attribute VB_Name = "MultiLanguage"
-'多语言支持模块
-'语言文件： Vb6Tkinter.lng
-' 文件格式：
-'    [语言名称]
-'    控件名=字符串
-'    其他字符名=字符串    '这个用于内部字符串，比如帮助信息等，在字符串中使用\n表示回车
+'Multi-language support module
+'Language file: Vb6Tkinter.lng
+' File format:
+'    [Language Name]
+'    ControlName=String
+'    OtherStringName=String    'This is used for internal strings, such as help information, use \n in the string to represent a newline
 '
-'ChangeLanguage(语言名)   : 切换控件显示语言，这个函数也会一次性缓存对应语种的所有字符串到内存
-'L(名字,默认字符串)       : 获取指定字符串
-'L_F(名字,默认字符串,其他参数) : 类似Python的{0}{1}格式化字符串
-'GetAllLanguageName()     : Vb6Tkinter.lng中所有语种的名称，字符串数组
+'ChangeLanguage(LanguageName)   : Switch the display language of the controls, this function will also cache all strings of the corresponding language to memory at once
+'L(Name, DefaultString)         : Get the specified string
+'L_F(Name, DefaultString, OtherParameters) : Similar to Python's {0}{1} formatted string
+'GetAllLanguageName()           : All language names in Vb6Tkinter.lng, string array
 
 Option Explicit
 Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
 Private Const LanguageFile = "Vb6Tkinter.lng"
-Private m_Lng As New Dictionary                                                 '对应语种的{名称,字符串}字典
+Private m_Lng As New Dictionary                                                 'Dictionary of {Name, String} for the corresponding language
 Public Const DEF_LNG = "English(&E)"
 
-'根据当前语种设置获取一个字符串
+'Get a string based on the current language setting
 Public Function L(sKey As String, ByVal sDefault As String) As String
     sDefault = Replace(sDefault, "\n", vbCrLf)
     L = GetString("", sKey, sDefault)
 End Function
 
-'根据当前语种设置获取一个字符串
-'支持类似python的{0}{1}格式化字符串，从{0}开始编号，不支持{}形式(没有数字索引)
+'Get a string based on the current language setting
+'Supports Python-like {0}{1} formatted strings, starting from {0}, does not support {} format (without numeric index)
 Public Function L_F(sKey As String, ByVal sDefault As String, ParamArray v() As Variant) As String
     
     Dim s As String, I As Long
@@ -48,7 +48,7 @@ Public Function GetAllLanguageName() As String()
         ns = GetPrivateProfileString(vbNullString, vbNullString, vbNullString, s, 1000, LngFile())
         GetAllLanguageName = Split(Trim(Replace(Left(s, ns), Chr(0) & Chr(0), "")), Chr(0))
     Else
-        GetAllLanguageName = Split(DEF_LNG)                                     '没有语言文件则默认为英文
+        GetAllLanguageName = Split(DEF_LNG)                                     'If there is no language file, default to English
     End If
     s = ""
 End Function
@@ -56,7 +56,7 @@ End Function
 Public Function ChangeLanguage(Language As String) As Boolean
     Dim I As Long, Ctrl As Control, s As String, ns As Long, sa() As String
     
-    '先缓存对应语种的语言字符串
+    'First cache the language strings of the corresponding language
     s = Space(10000)
     ns = GetPrivateProfileString(Language, vbNullString, vbNullString, s, 10000, LngFile())
     sa = Split(Trim(Replace(Left(s, ns), Chr(0) & Chr(0), "")), Chr(0))
@@ -68,7 +68,7 @@ Public Function ChangeLanguage(Language As String) As Boolean
         If Len(s) Then m_Lng.Add sa(I), s
     Next
     
-    '切换所有控件的语言
+    'Switch the language of all controls
     For I = 0 To Forms.Count - 1
         For Each Ctrl In Forms(I).Controls
             ChangeControlLanguage Ctrl, Language

@@ -13,11 +13,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'组合框适配器类
-'因为TK中没有组合框，所以VB的组合框映射到Tk的OptionMenu
-'如果启动了TTK后，则映射到TTK的Combobox
-'VB窗体上一旦有组合框，则OptionMenu和Combobox都创建
-'所以使用了一个中间层做为适配器，选择其中一个
+'Combobox adapter class
+'Since there is no combobox in TK, the VB combobox is mapped to Tk's OptionMenu
+'If TTK is enabled, it is mapped to TTK's Combobox
+'Once there is a combobox on the VB form, both OptionMenu and Combobox are created
+'So an intermediate layer is used as an adapter to select one of them
 
 Private m_usettk As Boolean
 Private m_OptionMenu As clsOptionMenu
@@ -28,12 +28,12 @@ Public Property Let TTK(usettk As Boolean)
     m_usettk = usettk
 End Property
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handler callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     If usettk Then
         m_Combobox.toString sOut, sCmd, sI18n, rel, usettk
@@ -42,15 +42,15 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     End If
 End Sub
 
-'创建对象后要马上调用这个函数初始化各参数
+'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     m_Combobox.InitConfig o, parentWidth, parentHeight, dMethods
     m_OptionMenu.InitConfig o, parentWidth, parentHeight, dMethods
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     If m_usettk Then
         GetAttrValueList = m_Combobox.GetAttrValueList(sAttr, sa)
@@ -59,7 +59,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     If m_usettk Then
         hasAttribute = m_Combobox.hasAttribute(sAttr)
@@ -68,7 +68,7 @@ Public Function hasAttribute(sAttr As String) As Boolean
     End If
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     If m_usettk Then
         GetAttrCurrentValue = m_Combobox.GetAttrCurrentValue(sAttr)
@@ -92,8 +92,8 @@ Private Sub Class_Initialize()
     m_CanbeOutByMainForm = True
 End Sub
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     If m_usettk Then
         Set Allitems = m_Combobox.Allitems()
@@ -102,7 +102,7 @@ Public Function Allitems() As Collection
     End If
 End Function
 
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+'Update the configuration selected by the user to the object, the parameter is many attribute/value pairs separated by "|"
 Public Sub SetConfig(sAttrs As String)
     If m_usettk Then
         m_Combobox.SetConfig (sAttrs)
@@ -111,7 +111,7 @@ Public Sub SetConfig(sAttrs As String)
     End If
 End Sub
 
-'修改或增加单个配置项，属性/值由"|"分隔
+'Modify or add a single configuration item, attribute/value separated by "|"
 Public Sub SetSingleConfig(sAttr As String)
     If m_usettk Then
         m_Combobox.SetSingleConfig (sAttr)
@@ -141,13 +141,13 @@ Public Property Get Name() As String
     End If
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     'm_Base.ctlType = sType
     'm_Base.StyleName = sStyleName
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = m_CanbeOutByMainForm
 End Property
@@ -155,7 +155,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
     m_CanbeOutByMainForm = bEnable
 End Property
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     If m_usettk Then
         m_Combobox.Serializer vSer
@@ -186,21 +186,20 @@ Public Property Let ScaleMode(nV As Long)
     m_OptionMenu.ScaleMode = nV
 End Property
 
-
-'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
-'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
-'返回值含义：
-'<0：表示本对象需要在另一个对象前输出代码
-'=0：表示两者将没有依赖关系，代码前后顺序无影响
-'>0：另一个对象要先输出代码。
-'整体的逻辑结果类似是重的沉底
+'Function used to simulate compare sorting, actually to determine the dependency relationship between two objects
+'Compare this object with another object, logical result is 'this object - another object'
+'Return value meaning:
+'<0: indicates that this object needs to output code before another object
+'=0: indicates that there is no dependency relationship between the two, code order is not affected
+'>0: another object needs to output code first.
+'The overall logical result is similar to heavier items sinking to the bottom
 Public Function Compare(ByRef Obj As Object) As Long
     
-    If Parent = Obj.Name Then '父控件先输出代码
+    If Parent = Obj.Name Then 'Parent control outputs code first
         Compare = 1
     ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then 'Top-level controls output first
         Compare = -1
     ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1

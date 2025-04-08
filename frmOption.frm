@@ -23,7 +23,7 @@ Begin VB.Form frmOption
    ScaleHeight     =   1305
    ScaleWidth      =   8010
    ShowInTaskbar   =   0   'False
-   StartUpPosition =   2  '屏幕中心
+   StartUpPosition =   2  'Screen Center
    Begin Vb6Tkinter.xpcmdbutton cmdOptionCancel 
       Height          =   375
       Left            =   5640
@@ -137,7 +137,7 @@ Private Sub cmdOptionCancel_Click()
     Unload Me
 End Sub
 
-'应用配置，返回true表示成功
+'Apply configuration, return true for success
 Private Function ApplySetting() As Boolean
     
     Dim sExe As String
@@ -169,7 +169,7 @@ End Sub
 Private Sub Form_Load()
     Dim ctl As Control
     
-    '多语种支持
+    'Multi-language support
     Me.Caption = L(Me.Name, Me.Caption)
     For Each ctl In Me.Controls
         If TypeName(ctl) = "xpcmdbutton" Or TypeName(ctl) = "Label" Then

@@ -18,7 +18,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-'²éÑ¯APIµÄÍøÖ·http://vbworld.sxnw.gov.cn/vbapi/
+'API query URL http://vbworld.sxnw.gov.cn/vbapi/
 Private Declare Function GetVersionEx Lib "kernel32" Alias "GetVersionExA" (ByRef lpVersionInformation As OSVERSIONINFO) As Long
 Private Declare Function GetTickCount Lib "kernel32" () As Long
 'Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -240,7 +240,7 @@ Private Const MK_CONTROL = &H8
 Private Const WSB_PROP_VSTYLE = &H100&
 Private Const WSB_PROP_HSTYLE = &H200&
 
-'¹ö¶¯Ìõ½á¹¹Ìå
+'Scroll bar structure
 Private Type SCROLLINFO
     cbSize As Long
     fMask As Long
@@ -263,7 +263,7 @@ Private m_bVisibleHorz      As Boolean
 Private m_bVisibleVert      As Boolean
 Private m_bNoFlatScrollBars As Boolean
 
-'Ã¶¾Ù
+'Enum
 Private Enum lgFlagsEnum
     lgFLChecked = 2
     lgFLSelected = 4
@@ -274,34 +274,34 @@ Private Enum lgFlagsEnum
     lgFLWordWrap = 128
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Private Enum lgCellFormatEnum
     lgCFBackColor = 2
     lgCFForeColor = 4
     lgCFImage = 8
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Private Enum lgHeaderStateEnum
     lgNormal = 1
     lgHot = 2
     lgDown = 3
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Private Enum lgRectTypeEnum
     lgRTColumn = 0
     lgRTCheckBox = 1
     lgRTImage = 2
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum lgAllowResizingEnum
     NotResize = 0
     Resize = 1
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum lgAlignmentEnum
     lgAlignLeftTop = DT_LEFT Or DT_TOP
     lgAlignLeftCenter = DT_LEFT Or DT_VCENTER
@@ -314,10 +314,10 @@ Public Enum lgAlignmentEnum
     lgAlignRightBottom = DT_RIGHT Or DT_BOTTOM
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum lgBorderStyleEnum
-    ÎÞ = 0
-    ±ß¿ò = 1
+    None = 0
+    Border = 1
 End Enum
 
 Public Enum lgDataTypeEnum
@@ -329,7 +329,7 @@ Public Enum lgDataTypeEnum
     lgCustom = 5
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum lgEditTypeEnum
     None = 0
     EnterKey = 2
@@ -338,20 +338,20 @@ Public Enum lgEditTypeEnum
     MouseDblClick = 16
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum SelectModeEnum
-    ÎÞ = 0
-    ÐÐ = 1
-    ÁÐ = 2
+    None = 0
+    Single = 1
+    Multiple = 2
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum FocusStyleEnum
     Light = 0
     Heavy = 1
 End Enum
 
-'Ã¶¾Ù
+'Enum
 Public Enum lgMoveControlEnum
     lgBCNone = 0
     lgBCHeight = 1
@@ -360,7 +360,7 @@ Public Enum lgMoveControlEnum
     lgBCTop = 8
 End Enum
 
-'Ñ¡ÔñÄ£Ê½Ã¶¾Ù
+'Selection mode Enum
 Public Enum lgSearchModeEnum
     lgSMEqual = 0
     lgSMGreaterEqual = 1
@@ -368,7 +368,7 @@ Public Enum lgSearchModeEnum
     lgSMNavigate = 4
 End Enum
 
-'ÅÅÐò·½Ê½Ã¶¾Ù
+'Sorting type Enum
 Public Enum lgSortTypeEnum
     lgSTAscending = 0
     lgSTDescending = 1
@@ -387,7 +387,7 @@ Private lgSMEqual, lgSMGreaterEqual, lgSMLike, lgSMNavigate
 Private lgSTAscending, lgSTDescending
 #End If
 
-'ÁÐµÄ½á¹¹Ìå
+'Column structure
 Private Type udtColumn
     EditCtrl As Object
     dCustomWidth As Single
@@ -405,7 +405,7 @@ Private Type udtColumn
     sTag As String
 End Type
 
-'µ¥Ôª¸ñµÄ½á¹¹Ìå
+'Cell structure
 Private Type udtCell
     nAlignment As Integer
     nFormat As Integer
@@ -413,7 +413,7 @@ Private Type udtCell
     sValue As String
 End Type
 
-'ÐÐµÄ½á¹¹Ìå
+'Item structure
 Private Type udtItem
     lHeight As Long
     lImage As Long
@@ -423,7 +423,7 @@ Private Type udtItem
     Cell() As udtCell
 End Type
 
-'¸ñÊ½µÄ½á¹¹Ìå
+'Format structure
 Private Type udtFormat
     lBackColor As Long
     lForeColor As Long
@@ -431,17 +431,17 @@ Private Type udtFormat
     nCount As Long
 End Type
 
-'ÕûÌåäÖÈ¾µÄ½á¹¹Ìå
+'Rendering structure
 Private Type udtRender
     DTFlag As Long
-    CheckBoxSize As Long                                                        '¸´Ñ¡¿òµÄ´óÐ¡
-    ImageSpace As Long                                                          'Í¼Æ¬µÄ¿Õ°×ËùÕ¼µÄÏñËØ
-    ImageHeight As Long                                                         'Í¼Æ¬µÄ¸ß¶È
-    ImageWidth As Long                                                          'Í¼Æ¬µÄ¿í¶È
-    LeftImage As Long                                                           'Í¼Æ¬µÄ×ó±ßÎ»ÖÃ
-    LeftText As Long                                                            'ÎÄ±¾µÄ×ó±ßÎ»ÖÃ
-    HeaderHeight As Long                                                        '±íÍ·µÄ¸ß¶È
-    TextHeight As Long                                                          'ÎÄ±¾µÄ¸ß¶È
+    CheckBoxSize As Long                                                        'Checkbox size
+    ImageSpace As Long                                                          'Image spacing
+    ImageHeight As Long                                                         'Image height
+    ImageWidth As Long                                                          'Image width
+    LeftImage As Long                                                           'Left image position
+    LeftText As Long                                                            'Left text position
+    HeaderHeight As Long                                                        'Header height
+    TextHeight As Long                                                          'Text height
 End Type
 
 Private WithEvents txtEdit As TextBox
@@ -876,7 +876,7 @@ Private Sub ApplyCellFormat(ByVal Row As Long, ByVal Col As Long, Apply As lgCel
             nFreeIndex = lCount
         End If
     Next lCount
-    
+
     'No existing matches
     If Not bMatch Then
         'Is there an unused Entry?
@@ -893,7 +893,7 @@ Private Sub ApplyCellFormat(ByVal Row As Long, ByVal Col As Long, Apply As lgCel
             .nImage = nImage
         End With
     End If
-    
+
     'Has the Format Entry Index changed?
     If (nIndex <> nNewIndex) Then
         'Increment reference count for new entry
@@ -904,7 +904,7 @@ Private Sub ApplyCellFormat(ByVal Row As Long, ByVal Col As Long, Apply As lgCel
             mCF(nIndex).nCount = mCF(nIndex).nCount - 1
         End If
     End If
-    
+
     mItems(Row).Cell(Col).nFormat = nNewIndex
 End Sub
 
@@ -1456,11 +1456,11 @@ Private Sub DrawGrid(bRedraw As Boolean)
 'Purpose: The Primary Rendering routine. Draws Columns & Rows
     '#############################################################################################################################
     
-    Dim IR As RECT                                                              '¶¨ÒåÒ»¸ö¾ØÐÎ
-    Dim r As RECT                                                               '¶¨ÒåÒ»¸ö¾ØÐÎ
+    Dim IR As RECT                                                              ' Define a rectangle
+    Dim r As RECT                                                               ' Define a rectangle
     Dim lX As Long
     Dim lY As Long
-    
+
     Dim lCol As Long
     Dim lRow As Long
     Dim lMaxRow As Long
@@ -1479,48 +1479,48 @@ Private Sub DrawGrid(bRedraw As Boolean)
     Dim bItalic As Boolean
     Dim bUnderLine As Boolean
     
-    'Èç¹ûÖØ»­
+    ' If redrawing
     If bRedraw Then
-        lStartCol = SBValue(efsHorizontal)                                      '¼ÇÂ¼¹ö¶¯Ìõ·½Ïò
-        lGridColor = TranslateColor(mGridColor)                                 '¼ÇÂ¼GridÑÕÉ«
+        lStartCol = SBValue(efsHorizontal)                                      ' Record scrollbar direction
+        lGridColor = TranslateColor(mGridColor)                                 ' Record grid color
         
-        lY = mR.HeaderHeight                                                    '¼ÇÂ¼±êÌâµÄ¸ß¶È
+        lY = mR.HeaderHeight                                                    ' Record header height
         mItemsVisible = ItemsVisible()
         lRowWrapSize = (mR.TextHeight * 2)
         
         With UserControl
             .Cls
             
-            bBold = .FontBold                                                   'ÉèÖÃ×ÖÌå´ÖÏ¸
-            bItalic = .FontItalic                                               'ÉèÖÃ×ÖÌåÐ±Ìå
-            bUnderLine = .FontUnderline                                         'ÉèÖÃ×ÖÌåÏÂ»®Ïß
+            bBold = .FontBold                                                   ' Set font bold
+            bItalic = .FontItalic                                               ' Set font italic
+            bUnderLine = .FontUnderline                                         ' Set font underline
             
-            lColumnsWidth = DrawHeaderRow()                                     'µ÷ÓÃ»­±íÍ·º¯Êý
+            lColumnsWidth = DrawHeaderRow()                                     ' Call function to draw header row
             
-            lMaxRow = (SBValue(efsVertical) + mItemsVisible)                    '¹ö¶¯Ìõ·½ÏòºÍ¿É¼ûÐÐÊý
-            If lMaxRow > mItemCount Then                                        'Èç¹û´óÓÚ×ÜÐÐÊý£¬ÔòÁî×îÐÐÎª×ÜÐÐÊý
+            lMaxRow = (SBValue(efsVertical) + mItemsVisible)                    ' Scrollbar direction and visible rows
+            If lMaxRow > mItemCount Then                                        ' If greater than total rows, set max row to total rows
                 lMaxRow = mItemCount
             End If
             
-            'È¡³ö¹ö¶¯ÌõÔÚ´¹Ö±·½ÏòÉÏµÄÎ»ÖÃ×÷Îª³õÊ¼Öµ£¬×ÜÐÐÊý×÷Îª½áÊøÖµ
+            ' Take scrollbar vertical position as start value, total rows as end value
             lStart = SBValue(efsVertical)
-            'Ë«²ãÑ­»·£¬Íâ²ãÊÇÐÐÑ­»·£¬ÄÚ²ãÊÇÁÐÑ­»·
+            ' Double loop: outer loop for rows, inner loop for columns
             For lRow = lStart To lMaxRow
-                'Èç¹ûÊÇ¶àÑ¡Ä£Ê½»òÐÐÑ¡Ä£Ê½£¬²¢ÇÒÐÐ±ê¼ÇºÍÑ¡Ôñ±ê¼Ç
+                ' If multi-select mode or full-row select mode, and row is marked as selected
                 If (mMultiSelect Or mFullRowSelect) And (mItems(mRowPtr(lRow)).nFlags And lgFLSelected) Then
-                    'Ëø¶¨ÑÕÉ«
+                    ' Lock color
                     bLockColor = True
-                    'Èç¹ûÆðÊ¼ÁÐÎªÁã£¬ÏÈÉèÖÃÆðÊ¼ÁÐµÄ¾ØÐÎ£¬È»ºó»­ÆðÊ¼ÁÐµÄ¾ØÐÎ
-                    If lStartCol = 0 Then                                       ' ensure 1st column is visible
-                        'Èç¹ûµÚÒ»ÁÐµÄ¿í¶ÈÐ¡ÓÚÒª³ÊÏÖµÄ×ó±ßÎÄ±¾
+                    ' If starting column is zero, set rectangle for starting column and draw it
+                    If lStartCol = 0 Then                                       ' Ensure 1st column is visible
+                        ' If the width of the first column is less than the left text to be displayed
                         If mCols(0).lWidth < mR.LeftText Then
-                            'SetRectÊÇAPIº¯ÊýÓÃÀ´ÉèÖÃ¸ñÊ½»¯¾ØÐÎµÄ£¬¸ñÊ½»¯¾ØÐÎÀ´¹ÜÀí±à¼­¿Ø¼þÎÄ±¾ÏÔÊ¾ÇøÓòµÄ´óÐ¡£¬
-                            'Ä¬ÈÏºÍ´°¿Ú¿Í»§ÇøÒ»Ñù´ó£¬µ«¿ÉÒÔÓÃSetRectÀ´ÉèÖÃ¡£
-                            'Ö¸¶¨¸ñÊ½»¯¾ØÐÎµÄÐÂµÄ³ß´ç¡£
-                            'Ê¹ÓÃSetRectº¯ÊýÉèÖÃÒ»¸ö¶Ô¶àÐÐ±à¼­¿Ø¼þµÄ¸ñÊ½»¯¾ØÐÎ¡£´Ë¸ñÊ½»¯¾ØÐÎÎªÎÄ±¾µÄ±ß½ç¾ØÐÎ£¬Óë±à¼­¿Ø¼þ´°¿ÚµÄ´óÐ¡ÎÞ¹Ø¡£
-                            '²ÎÊý£º lpRect ÊÇÒ»¸öCRect»òÒ»¸öÖ¸ÏòRECTµÄÖ¸Õë¡£Ëü±íÃ÷ÁË¸ñÊ½»¯¾ØÐÎµÄÐÂµÄ½çÏß¡£
-                            '       ×óÉÏ½Ç×ø±êX1,KY1;ÓÒÏÂ½Ç×ø±êX2,Y2¡£¼´ÏÈ»­|ÔÙ»­_£¬×îÖÕ³É|_
-                            SetRect r, 0, lY + 1, mCols(0).lWidth, lY + (mItems(mRowPtr(lRow)).lHeight) = 1
+                            ' SetRect is an API function used to set a formatted rectangle, which manages the text display area of an edit control.
+                            ' By default, it is the same size as the client area of the window, but it can be customized using SetRect.
+                            ' Specifies the new dimensions of the formatted rectangle.
+                            ' The SetRect function is used to set a formatted rectangle for a multi-line edit control. This formatted rectangle defines the text boundary and is independent of the edit control window's size.
+                            ' Parameters: 
+                            '   lpRect - A CRect or a pointer to a RECT structure. It specifies the new boundaries of the formatted rectangle.
+                            '   Top-left coordinates: X1, Y1; Bottom-right coordinates: X2, Y2. This means drawing | first, then _, resulting in |_.                            SetRect r, 0, lY + 1, mCols(0).lWidth, lY + (mItems(mRowPtr(lRow)).lHeight) + 1
                         Else
                             SetRect r, 0, lY + 1, mR.LeftText, lY + (mItems(mRowPtr(lRow)).lHeight) + 1
                         End If
@@ -1529,13 +1529,13 @@ Private Sub DrawGrid(bRedraw As Boolean)
                         r.Right = 0
                     End If
                     
-                    '½ô°¤RµÄÓÒ±ß½Ó×ÅÔÚ»°Ò»¸ö¾ØÐÎ
+                    ' Draw another rectangle adjacent to the right of R
                     SetRect r, r.Right, lY + 1, lColumnsWidth, lY + (mItems(mRowPtr(lRow)).lHeight) + 1
                     
                     If mAlphaBlendSelection Then
                         lValue = BlendColor(TranslateColor(mSelectBackColor), TranslateColor(vbWhite), 120)
                     Else
-                        '½«ÑÕÉ«Öµ×ª»»ÎªÕûÐÍ
+                        ' Convert color value to integer
                         lValue = TranslateColor(mSelectBackColor)
                     End If
                     
@@ -1543,7 +1543,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                     
                     .ForeColor = mSelectForeColor
                 Else
-                    'ÖÃËø¶¨ÑÕÉ«±ê¼ÇÎª¼Ù£¬¸ñÊ½»¯¾ØÐÎ£¬È»ºó»­¾ØÐÎ
+                    ' Set lock color flag to false, format rectangle, and draw rectangle
                     bLockColor = False
                     SetRect r, 0, lY + 1, lColumnsWidth, lY + (mItems(mRowPtr(lRow)).lHeight) + 1
                     DrawRect .hdc, r, TranslateColor(vbWhite), True
@@ -1553,20 +1553,24 @@ Private Sub DrawGrid(bRedraw As Boolean)
                 For lCol = lStartCol To UBound(mCols)
                     '
                     If mCols(mColPtr(lCol)).bVisible Then
-                        '¡¾APIº¯Êý--SetRectRgn¡¿SelectClipRgn
-                        '¹¦ÄÜ£ºÉèÖÃÇøÓòÎªX1£¬Y1ºÍX2£¬Y2ÃèÊöµÄ¾ØÐÎ;ËüÊÇÉèÖÃÒ»¸öÒÑ´æÔÚÇøÓò¶ø²»ÊÇ´´½¨Ò»¸öÐÂÇøÓò,¾ØÐÎµÄµ×ºÍÓÒ±ß²»°üÀ¨ÔÚÇøÓòÄÚ
-                        '²ÎÊý£ºhRgn Long£¬¸ÃÇøÓò½«±»ÉèÖÃÎªÖ¸¶¨¾ØÐÎ
-                        '      X1,Y1 Long£¬¾ØÐÎ×óÉÏ½ÇX£¬Y×ø±ê
-                        '      X2,Y2 Long£¬¾ØÐÎÓÒÏÂ½ÇX£¬Y×ø±ê
-                        '¡¾APIº¯Êý--SelectClipRgn¡¿
-                        '¹¦ÄÜ£ºÎªÖ¸¶¨Éè±¸³¡¾°Ñ¡ÔñÐÂµÄ¼ô²ÃÇø
-                        '²ÎÊý£º
-                        '     hdc Long£¬½«ÉèÖÃÐÂ¼ô²ÃÇøµÄÉè±¸³¡¾°
-                        '     hRgn Long£¬½«ÎªÉè±¸³¡¾°ÉèÖÃ¼ô²ÃÇøµÄ¾ä±ú£¬¸ÃÇøÓòÊ¹ÓÃÉè±¸×ø±ê
-                        '·µ»ØÖµ£º
-                        '    Long£¬ÏÂÁÐ³£ÊýÖ®Ò»£¬ÒÔÃèÊöµ±Ç°¼ô²ÃÇø£º
-                        '    COMPLEXREGION£º¸ÃÇøÓòÓÐ»¥Ïà½»µþµÄ±ß½ç£»SIMPLEREGION£º¸ÃÇøÓò±ß½çÃ»ÓÐ»¥Ïà½»µþ£»NULLREGION£ºÇøÓòÎª¿Õ
-                        '
+                        ' [API Function - SetRectRgn] SelectClipRgn
+                        ' Function: Sets a region to the rectangle described by X1, Y1, X2, and Y2. It modifies an existing region rather than creating a new one. 
+                        '           The bottom and right edges of the rectangle are not included in the region.
+                        ' Parameters:
+                        '   hRgn Long - The region to be set to the specified rectangle.
+                        '   X1, Y1 Long - The X and Y coordinates of the top-left corner of the rectangle.
+                        '   X2, Y2 Long - The X and Y coordinates of the bottom-right corner of the rectangle.
+
+                        ' [API Function - SelectClipRgn]
+                        ' Function: Selects a new clipping region for the specified device context.
+                        ' Parameters:
+                        '   hdc Long - The device context for which the new clipping region will be set.
+                        '   hRgn Long - The handle to the region that will be set as the clipping region for the device context. This region uses device coordinates.
+                        ' Return Value:
+                        '   Long - One of the following constants, describing the current clipping region:
+                        '       COMPLEXREGION: The region has overlapping boundaries.
+                        '       SIMPLEREGION: The region boundaries do not overlap.
+                        '       NULLREGION: The region is empty.
                         SetRectRgn mClipRgn, lX, lY, lX + mCols(mColPtr(lCol)).lWidth, lY + mItems(mRowPtr(lRow)).lHeight
                         SelectClipRgn .hdc, mClipRgn
                         
@@ -1579,9 +1583,9 @@ Private Sub DrawGrid(bRedraw As Boolean)
                             .ForeColor = mCF(mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFormat).lForeColor
                         End If
                         
-                        'Èç¹ûÕýÔÚ»­µÚ0ÁÐ
+                        ' If drawing the 0th column
                         If lCol = 0 Then
-                            'Èç¹û±»ÉèÖÃÁË¸´Ñ¡¿ò
+                            ' If checkboxes are enabled
                             If mCheckboxes Then
                                 Call SetRect(r, 3, lY, mR.CheckBoxSize, lY + mItems(mRowPtr(lRow)).lHeight)
                                 
@@ -1590,14 +1594,15 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                 Else
                                     lValue = 0
                                 End If
-                                '¡¾APIº¯Êý DrawFrameControl¡¿
-                                '¹¦ ÄÜ£ºÓÃÓÚÃè»æÒ»¸ö±ê×¼¿Ø¼þ¡£
-                                '²Î Êý£º
-                                '     hDC Long£¬ÒªÔÚÆäÖÐ×÷»­µÄÉè±¸³¡¾°
-                                '     lpRect RECT£¬Ö¸¶¨Ö¡µÄÎ»ÖÃ¼°´óÐ¡µÄÒ»¸ö¾ØÐÎ
-                                '     un1 Long£¬Ö¸¶¨Ö¡ÀàÐÍµÄÒ»¸ö³£Êý¡£ÕâÐ©³£Êý°üÀ¨DFC_BUTTON£¬DFC_CAPTION£¬DFC_MENU£¬ÒÔ¼°DFC_SCROLL
-                                '     un2 Long£¬Ò»¸ö³£Êý£¬Ö¸¶¨ÓûÃè»æµÄÖ¡µÄ×´Ì¬¡£ÓÉ´øÓÐÇ°×ºDFCS_µÄÒ»¸ö³£Êý¹¹³É
-                                '·µ»ØÖµ£ºLong£¬·ÇÁã±íÊ¾³É¹¦£¬Áã±íÊ¾Ê§°Ü¡£»áÉèÖÃGetLastError
+                                ' [API Function - DrawFrameControl]
+                                ' Function: Used to draw a standard control.
+                                ' Parameters:
+                                '   hDC Long - The device context in which the control will be drawn.
+                                '   lpRect RECT - A rectangle specifying the position and size of the frame.
+                                '   un1 Long - A constant specifying the type of frame. These constants include DFC_BUTTON, DFC_CAPTION, DFC_MENU, and DFC_SCROLL.
+                                '   un2 Long - A constant specifying the state of the frame to be drawn. This is composed of constants prefixed with DFCS_.
+                                ' Return Value:
+                                '   Long - Non-zero indicates success, zero indicates failure. If it fails, GetLastError will be set.
                                 If Not DrawTheme("Button", 3, lValue, r) Then
                                     If mItems(mRowPtr(lRow)).nFlags And lgFLChecked Then
                                         Call DrawFrameControl(.hdc, r, DFC_BUTTON, DFCS_BUTTONCHECK Or DFCS_CHECKED Or DFCS_FLAT)
@@ -1607,26 +1612,27 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                 End If
                             End If
                             
-                            'Èç¹û°üº¬Í¼Æ¬¿Õ°×
+                            ' If image space is included
                             If mR.ImageSpace > 0 Then
-                                'If we have an Image Index then Draw it
+                                ' If we have an image index, draw it
                                 If mItems(mRowPtr(lRow)).lImage <> 0 Then
-                                    'Calculate Image offset (using ScaleMode of ImageList)
+                                    ' Calculate image offset (using ScaleMode of ImageList)
                                     If lImageLeft = 0 Then
-                                        '±ê×¼º¯Êý-ScaleX£º
-                                        '¹¦ÄÜ£ºÓÃÒÔ½« Form£¬PictureBox »ò Printer µÄ¿í¶È»ò¸ß¶ÈÖµ´ÓÒ»ÖÖ ScaleMode ÊôÐÔµÄ¶ÈÁ¿µ¥Î»×ª»»µ½ÁíÒ»ÖÖ¡£
+                                        ' Standard function - ScaleX:
+                                        ' Function: Used to convert the width or height value of a Form, PictureBox, or Printer from one ScaleMode property unit to another.
                                         lImageLeft = ScaleX(mR.LeftImage, vbPixels, mImageListScaleMode)
                                     End If
                                     
-                                    '±ê×¼º¯Êý-Draw£º
-                                    '¹¦ÄÜ£ºÔÚÒ»·ùÍ¼ÏóÉÏÖ´ÐÐÁËÒ»´ÎÍ¼ÐÎ²Ù×÷ºó£¬°Ñ¸ÃÍ¼Ïó»æÖÆµ½Ä³¸öÄ¿±êÉè±¸ÃèÊöÌåÖÐ£¬ÀýÈç PictureBox ¿Ø¼þÖÐ¡£
-                                    '²ÎÊý£ºobject ±ØÐèµÄ¡£¶ÔÏó±í´ïÊ½£¬ÆäÖµÊÇ:ListImage ¶ÔÏó¡¢ListImages ¼¯ºÏ
-                                    '      hDC ±ØÐèµÄ¡£Ò»¸öÉèÖÃÎªÄ¿±ê¶ÔÏóµÄ hDC ÊôÐÔµÄÖµ¡£
-                                    '      x,y ¿ÉÑ¡µÄ¡£ÓÃÀ´Ö¸¶¨Éè±¸ÃèÊöÌåÄÚ»æÖÆÍ¼ÏóµÄÎ»ÖÃ×ø±ê¡£Èç¹û²»Ö¸¶¨ÕâÐ©£¬Í¼Ïó½«±»»æÖÆÔÚÉè±¸ÃèÊöÌåµÄÆðµã¡£
-                                    '      style ¿ÉÑ¡µÄ¡£ËüÖ¸¶¨ÁËÔÚÍ¼ÏóÉÏ½øÐÐµÄ²Ù×÷£¬¡°ÉèÖÃÖµ¡±ÖÐÓÐÏêÏ¸ËµÃ÷¡£
-                                    
-                                    '±¸×¢£ºhDC ÊôÐÔÊÇ Windows ²Ù×÷ÏµÍ³ÓÃÀ´×÷ÄÚ²¿ÒýÓÃµ½¶ÔÏóµÄ¾ä±ú£¨ÊýÖµ£©¡£
-                                    '      ¿ÉÒÔÔÚÈÎºÎÓÐ hDC ÊôÐÔµÄ¿Ø¼þÄÚ²¿ÇøÓò»­Í¼¡£ÔÚ Visual Basic ÖÐ£¬ÉÏÊö¿Ø¼þ°üÀ¨ Form ¶ÔÏó¡¢PictureBox ¿Ø¼þºÍ Printer ¶ÔÏó¡£
+                                    ' Standard function - Draw:
+                                    ' Function: After performing a graphical operation on an image, this function draws the image onto a target device context, such as a PictureBox control.
+                                    ' Parameters: 
+                                    '   object - Required. An object expression, which can be a ListImage object or a ListImages collection.
+                                    '   hDC - Required. The value of the hDC property set for the target object.
+                                    '   x, y - Optional. Specifies the coordinates within the device context where the image will be drawn. If not specified, the image will be drawn at the origin of the device context.
+                                    '   style - Optional. Specifies the operation to be performed on the image, with detailed descriptions in the "settings" section.
+
+                                    ' Note: The hDC property is a handle (numeric value) used internally by the Windows operating system to reference objects.
+                                    '       You can draw within the internal area of any control that has an hDC property. In Visual Basic, such controls include the Form object, PictureBox control, and Printer object.
                                     If bLockColor Then
                                         mImageList.ListImages(Abs(mItems(mRowPtr(lRow)).lImage)).Draw .hdc, lImageLeft, ScaleY(lY + mR.ImageSpace, vbPixels, mImageListScaleMode), 2
                                     Else
@@ -1640,9 +1646,9 @@ Private Sub DrawGrid(bRedraw As Boolean)
                             Call SetRect(r, lX + 3, lY, (lX + mCols(mColPtr(lCol)).lWidth) - 3, lY + mItems(mRowPtr(lRow)).lHeight)
                         End If
                         
-                        'ÅÐ¶ÏÁÐµÄÀàÐÍ
+                        ' Determine column type
                         Select Case mCols(mColPtr(lCol)).nType
-                        Case lgBoolean                                          '²¼¶ûÐÍ
+                        Case lgBoolean                                          ' Boolean type
                             SetItemRect mRowPtr(lRow), mColPtr(lCol), lY, r, lgRTCheckBox
                             
                             If mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFlags And lgFLChecked Then
@@ -1651,12 +1657,12 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                 lValue = 0
                             End If
                             
-                            '¡¾APIº¯Êý--DrawFocusRect¡¿
-                            '    º¯ÊýÔ­ÐÍ£º
-                            '    º¯Êý¹¦ÄÜ£º
-                            '    ²Î    Êý£º
-                            '¡¡¡¡·µ »Ø Öµ£º
-                            '    ±¸    ×¢£º
+                            '[API Function - DrawFocusRect]
+                            '    Function Prototype:
+                            '    Function Purpose:
+                            '    Parameters:
+                            '    Return Value:
+                            '    Remarks:                            
                             If Not DrawTheme("Button", 3, lValue, r) Then
                                 If mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFlags And lgFLChecked Then
                                     Call DrawFrameControl(.hdc, r, DFC_BUTTON, DFCS_BUTTONCHECK Or DFCS_CHECKED Or DFCS_FLAT)
@@ -1665,15 +1671,15 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                 End If
                             End If
                             
-                        Case lgProgressBar                                      '½ø¶ÈÌõÐÍ
+                        Case lgProgressBar                                      ' Progress bar type
                             If mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFlags > 0 Then
                                 lValue = ((mCols(mColPtr(lCol)).lWidth - 2) / 100) * mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFlags
                                 
                                 SetRect r, lX + 2, lY + 2, lX + lValue, (lY + mItems(mRowPtr(lRow)).lHeight) - 2
-                                DrawRect .hdc, r, TranslateColor(&H8080FF), True '»­½ø¶ÈÌõ
+                                DrawRect .hdc, r, TranslateColor(&H8080FF), True ' Draw progress bar
                             End If
                             
-                        Case Else                                               'Èç¹ûÊÇÆäËüÀàÐÍµÄÁÐ
+                        Case Else                                               ' Other column types
                             With mItems(mRowPtr(lRow)).Cell(mColPtr(lCol))
                                 UserControl.FontBold = .nFlags And lgFLFontBold
                                 UserControl.FontItalic = .nFlags And lgFLFontItalic
@@ -1707,7 +1713,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                         End If
                                     End If
                                     
-                                    'Adjust Text Rect
+                                    ' Adjust text rectangle
                                     Select Case mCols(mColPtr(lCol)).nImageAlignment
                                     Case lgAlignLeftTop, lgAlignLeftCenter, lgAlignLeftBottom
                                         r.Left = r.Left + (IR.Right - IR.Left)
@@ -1717,13 +1723,13 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                     End Select
                                 End If
                                 
-                                '¡¾APIº¯Êý--DrawFocusRect¡¿
-                                '    º¯ÊýÔ­ÐÍ£º
-                                '    º¯Êý¹¦ÄÜ£º
-                                '    ²Î    Êý£º
-                                '¡¡¡¡·µ »Ø Öµ£º
-                                '    ±¸    ×¢£º
-                                Call DrawText(UserControl.hdc, sText, -1, r, lValue)
+                                ' [API Function - DrawFocusRect]
+                                '    Function Prototype:
+                                '    Function Purpose:
+                                '    Parameters:
+                                '    Return Value:
+                                '    Remarks:
+                                 Call DrawText(UserControl.hdc, sText, -1, r, lValue)
                             End With
                         End Select
                         
@@ -1733,7 +1739,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                 
                 SelectClipRgn .hdc, 0&
                 
-                'Display Horizontal Lines
+                ' Display horizontal lines
                 If mGridLines Then
                     DrawLine .hdc, 0, lY, lColumnsWidth, lY, lGridColor, mGridLineWidth
                 End If
@@ -1741,9 +1747,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                 lY = lY + mItems(mRowPtr(lRow)).lHeight
             Next lRow
             
-            '#############################################################################################################################
-            'Display Vertical Lines
-            'ÏÔÊ¾´¹Ö±Ïß
+            ' Display vertical lines
             If mGridLines Then
                 lBottomEdge = r.Bottom
                 
@@ -1757,28 +1761,26 @@ Private Sub DrawGrid(bRedraw As Boolean)
                 Next lCol
             End If
             
-            '#############################################################################################################################
-            'Display Focus Rectangle
-            'ÏÔÊ¾½¹µã¾ØÐÎ
-            If (mSelectMode <> SelectModeEnum.ÎÞ) And (mRow >= 0) Then
+            ' Display focus rectangle
+            If (mSelectMode <> SelectModeEnum.None) And (mRow >= 0) Then
                 If Not mInFocus Then
                     lY = RowTop(mRow)
                     If lY >= 0 Then
                         r.Right = 0
-                        If mSelectMode = ÁÐ Then
+                        If mSelectMode = Column Then
                             SetColRect mCol, r
                             r.Top = lY + 1
                             r.Bottom = lY + mItems(mRowPtr(mRow)).lHeight
-                        Else                                                    'If mFullRowSelect Then
+                        Else                                                    ' If mFullRowSelect Then
                             SetRect r, mR.LeftText, lY + 1, lColumnsWidth, lY + mItems(mRowPtr(mRow)).lHeight
                         End If
                         
-                        '¡¾APIº¯Êý--DrawFocusRect¡¿
-                        '    º¯ÊýÔ­ÐÍ£º
-                        '    º¯Êý¹¦ÄÜ£º
-                        '    ²Î    Êý£º
-                        '¡¡¡¡·µ »Ø Öµ£º
-                        '    ±¸    ×¢£º
+                        ' [API Function - DrawFocusRect]
+                        '    Function Prototype:
+                        '    Function Purpose:
+                        '    Parameters:
+                        '    Return Value:
+                        '    Remarks:
                         If r.Right > 0 Then
                             Select Case mFocusStyle
                             Case Light
@@ -1963,10 +1965,10 @@ End Sub
 
 Private Sub DrawRect(hdc As Long, rc As RECT, lcolor As Long, bFilled As Boolean)
     Dim lNewBrush As Long
-    '´´½¨Ò»¸ö»­Ë¢
+    ' Create a brush
     lNewBrush = CreateSolidBrush(lcolor)
     
-    'Èç¹ûÒªÌî³äÔòÔòÌî³ä£¬·ñÔòÖ»»­±ß¿ò
+    ' If filling is required, fill it; otherwise, only draw the border.
     If bFilled Then
         Call FillRect(hdc, rc, lNewBrush)
     Else
@@ -1974,38 +1976,41 @@ Private Sub DrawRect(hdc As Long, rc As RECT, lcolor As Long, bFilled As Boolean
     End If
     
     Call DeleteObject(lNewBrush)
-    'ÖªÊ¶µã£º
-    '¡¾APIº¯Êý--FillRect¡¿
-    '    º¯ÊýÔ­ÐÍ£ºint FillRect(HDC hdc, CONST RECT *lprc, HBRUSH hbr)£»
-    '    º¯Êý¹¦ÄÜ£º¸Ãº¯ÊýÓÃÖ¸¶¨µÄ»­Ë¢Ìî³ä¾ØÐÎ£¬´Ëº¯Êý°üÀ¨¾ØÐÎµÄ×óÉÏ±ß½ç£¬µ«²»°üÀ¨¾ØÐÎµÄÓÒÏÂ±ß½ç¡£
-    '    ²Î    Êý£º
-    '              hdc:     Éè±¸»·¾³¾ä±ú?
-    '              lprc:    Ö¸Ïòº¬ÓÐ½«Ìî³ä¾ØÐÎµÄÂß¼­×ø±êµÄRECT½á¹¹µÄÖ¸Õë?
-    '              hbr:     ÓÃÀ´Ìî³ä¾ØÐÎµÄ»­Ë¢µÄ¾ä±ú?
-    '¡¡¡¡·µ »Ø Öµ£ºÈç¹ûº¯Êýµ÷ÓÃ³É¹¦£¬·µ»ØÖµ·ÇÁã£»Èç¹ûº¯Êýµ÷ÓÃÊ§°Ü£¬·µ»ØÖµÊÇ0¡£
-    '    ±¸    ×¢£º
-    '          ÓÉ²ÎÊýhbr¶¨ÒåµÄ»­Ë¢¿ÉÒÔÊÇÒ»¸öÂß¼­ÏÖË¢¾ä±úÒ²¿ÉÒÔÊÇÒ»¸öÑÕÉ«Öµ£¬Èç¹ûÖ¸¶¨Ò»¸öÂß¼­»­Ë¢µÄ¾ä±ú£¬
-    '          µ÷ÓÃÏÂÁÐº¯ÊýÖ®Ò»À´»ñµÃ¾ä±ú£»CreateHatchBrush¡¢CreatePatternBrush»òCreateSolidBrush¡£
-    '          ´ËÍâ£¬Äã¿ÉÒÔÓÃGetStockObjectÀ´»ñµÃÒ»¸ö¿â´æ»­Ë¢¾ä±ú¡£Èç¹ûÖ¸¶¨Ò»¸öÑÕÉ«Öµ£¬
-    '          ±ØÐëÊÇ±ê×¼ÏµÍ³ÑÕÉ«£¨ËùÑ¡ÔñµÄÑÕÉ«±ØÐë¼Ó1£©ÈçFillRect(hdc, &rect, (HBRUSH)(COLOR_ENDCOLORS+1))£¬²Î¼ûGetSysColor¿ÉµÃµ½ËùÓÐ±ê×¼ÏµÍ³ÑÕÉ«ÁÐ±í¡£
-    '          µ±Ìî³äÒ»¸öÖ¸¶¨¾ØÐÎÊ±£¬FillRect²»°üÀ¨¾ØÐÎµÄÓÒ¡¢ÏÂ±ß½ç¡£ÎÞÂÛµ±Ç°Ó³ÉäÄ£Ê½ÈçºÎ£¬GDIÌî³äÒ»¸ö¾ØÐÎ¶¼²»°üÀ¨ÓÒ±ßµÄÁÐºÍÏÂÃæµÄÐÐ¡£
-    '¡¾APIº¯Êý--FrameRect¡¿
-    '    º¯ÊýÔ­ÐÍ£ºint frameRect(HDC hdc, CONST RECT *lprc, HBRUSH hbr)£»
-    '    º¯Êý¹¦ÄÜ£º¸Ãº¯ÊýÓÃÖ¸¶¨µÄ»­Ë¢ÎªÖ¸¶¨µÄ¾ØÐÎ»­±ß¿ò¡£±ß¿òµÄ¿íºÍ¸ß×ÜÊÇÒ»¸öÂß¼­µ¥Ôª¡£
-    '    ²Î    Êý£º
-    '             hdc:  ½«Òª»­±ß¿òµÄÉè±¸»·¾³¾ä±ú¡£
-    '             lprc: Ö¸Ïò°üº¬¾ØÐÎ×óÉÏ½ÇºÍÓÒÉÏ½ÇÂß¼­×ø±êµÄ½á¹¹RECTµÄÖ¸Õë?
-    '             hbr:  ÓÃÓÚ»­±ß¿òµÄ»­Ë¢¾ä±ú?
-    '¡¡¡¡·µ »Ø Öµ£ºÈç¹ûº¯Êýµ÷ÓÃ³É¹¦£¬·µ»ØÖµ·ÇÁã£»Èç¹ûº¯Êýµ÷ÓÃÊ§°Ü£¬·µ»ØÖµÊÇ0¡£
-    '    ±¸    ×¢£ºÓÉ²ÎÊýhbr¶¨ÒåµÄ»­Ë¢±ØÐëÊÇÓÉCreateHatchBrush¡¢CreatePatternBrush»òCreateSolidBrush´´½¨µÄ£¬»òÕßÊÇÓÉÊ¹ÓÃGetStockObject»ñµÃµÄ¡£
-    '              Èç¹ûRECT½á¹¹ÖÐµÄµ×²¿³ÉÔ±µÄÖµÉÙÓÚ»òµÈÓÚ¶¥²¿³ÉÔ±£¬»òÓÒ²¿³ÉÔ±ÉÙÓÚ»òµÈÓÚ×ó²¿³ÉÔ±£¬´Ëº¯Êý»­²»ÁË¾ØÐÎ
-    '¡¾APIº¯Êý--DeleteObject¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£ºÓÃÕâ¸öº¯ÊýÉ¾³ýGDI¶ÔÏó£¬±ÈÈç»­±Ê¡¢Ë¢×Ó¡¢×ÖÌå¡¢Î»Í¼¡¢ÇøÓòÒÔ¼°µ÷É«°åµÈµÈ¡£¶ÔÏóÊ¹ÓÃµÄËùÓÐÏµÍ³×ÊÔ´¶¼»á±»ÊÍ·Å
-    '    ²Î    Êý£ºhObject:Long£¬Ò»¸öGDI¶ÔÏóµÄ¾ä±ú
-    '¡¡¡¡·µ »Ø Öµ£ºLong£¬·ÇÁã±íÊ¾³É¹¦£¬Áã±íÊ¾Ê§°Ü
-    '    ±¸    ×¢£º²»ÒªÉ¾³ýÒ»¸öÒÑÑ¡ÈëÉè±¸³¡¾°µÄ»­±Ê¡¢Ë¢×Ó»òÎ»Í¼¡£ÈçÉ¾³ýÒÔÎ»Í¼Îª»ù´¡µÄÒõÓ°£¨Í¼°¸£©Ë¢×Ó£¬Î»Í¼²»»áÓÉÕâ¸öº¯ÊýÉ¾³ý¡ª¡ªÖ»ÓÐË¢×Ó±»É¾µô
-    
+    ' Knowledge Points:
+    ' [API Function - FillRect]
+    '    Function Prototype: int FillRect(HDC hdc, CONST RECT *lprc, HBRUSH hbr);
+    '    Function Purpose: This function fills a rectangle with the specified brush. It includes the top-left boundary of the rectangle but excludes the bottom-right boundary.
+    '    Parameters:
+    '        hdc:     Handle to the device context.
+    '        lprc:    Pointer to a RECT structure containing the logical coordinates of the rectangle to be filled.
+    '        hbr:     Handle to the brush used to fill the rectangle.
+    '    Return Value: If the function succeeds, the return value is non-zero; if it fails, the return value is 0.
+    '    Remarks:
+    '        The brush defined by the hbr parameter can be a handle to a logical brush or a color value. If a logical brush handle is specified, use one of the following functions to obtain the handle: CreateHatchBrush, CreatePatternBrush, or CreateSolidBrush.
+    '        Additionally, you can use GetStockObject to obtain a stock brush handle. If a color value is specified, it must be a standard system color (the selected color must be incremented by 1), e.g., FillRect(hdc, &rect, (HBRUSH)(COLOR_ENDCOLORS+1)). See GetSysColor for a list of all standard system colors.
+    '        When filling a specified rectangle, FillRect excludes the right and bottom boundaries of the rectangle. Regardless of the current mapping mode, GDI does not include the right column and bottom row when filling a rectangle.
+
+    ' [API Function - FrameRect]
+    '    Function Prototype: int FrameRect(HDC hdc, CONST RECT *lprc, HBRUSH hbr);
+    '    Function Purpose: This function draws a border around the specified rectangle using the specified brush. The width and height of the border are always one logical unit.
+    '    Parameters:
+    '        hdc:  Handle to the device context in which the border will be drawn.
+    '        lprc: Pointer to a RECT structure containing the logical coordinates of the top-left and bottom-right corners of the rectangle.
+    '        hbr:  Handle to the brush used to draw the border.
+    '    Return Value: If the function succeeds, the return value is non-zero; if it fails, the return value is 0.
+    '    Remarks:
+    '        The brush defined by the hbr parameter must be created using CreateHatchBrush, CreatePatternBrush, or CreateSolidBrush, or obtained using GetStockObject.
+    '        If the bottom member of the RECT structure is less than or equal to the top member, or the right member is less than or equal to the left member, this function cannot draw the rectangle.
+
+    ' [API Function - DeleteObject]
+    '    Function Prototype:
+    '    Function Purpose: This function deletes GDI objects, such as pens, brushes, fonts, bitmaps, regions, and palettes. All system resources used by the object are released.
+    '    Parameters:
+    '        hObject: Long, a handle to a GDI object.
+    '    Return Value: Long, non-zero indicates success, zero indicates failure.
+    '    Remarks:
+    '        Do not delete a pen, brush, or bitmap that is currently selected into a device context. If you delete a brush based on a bitmap (pattern brush), the bitmap itself will not be deleted by this functionâ€”only the brush will be deleted.    
+
 End Sub
 
 Private Sub DrawSortArrow(lX As Long, lY As Long, lWidth As Long, lStep As Long, nOrientation As lgSortTypeEnum)
@@ -2051,19 +2056,19 @@ Private Sub DrawText(ByVal hdc As Long, ByVal lpString As String, ByVal nCount A
     Else
         DrawTextA hdc, lpString, nCount, lpRect, wFormat
     End If
-    '¡¾ÖªÊ¶µã¡¿
-    '¡¾APIº¯Êý--DrawTextW¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£º
-    '    ²Î    Êý£º
-    '¡¡¡¡·µ »Ø Öµ£º
-    '    ±¸    ×¢£º
-    '¡¾APIº¯Êý--DrawTextA¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£º
-    '    ²Î    Êý£º
-    '¡¡¡¡·µ »Ø Öµ£º
-    '    ±¸    ×¢£º
+    ' [Knowledge Points]
+    ' [API Function - DrawTextW]
+    '    Function Prototype:
+    '    Function Purpose:
+    '    Parameters:
+    '    Return Value:
+    '    Remarks:
+    ' [API Function - DrawTextA]
+    '    Function Prototype:
+    '    Function Purpose:
+    '    Parameters:
+    '    Return Value:
+    '    Remarks:
 End Sub
 
 Private Function DrawTheme(sClass As String, ByVal iPart As Long, ByVal iState As Long, rtRect As RECT, Optional ByVal CloseTheme As Boolean = False) As Boolean
@@ -2084,25 +2089,25 @@ Private Function DrawTheme(sClass As String, ByVal iPart As Long, ByVal iState A
         If CloseTheme Then Call CloseThemeData(hTheme)
     End If
     Exit Function
-    'ÖªÊ¶µã£º
-    '¡¾APIº¯Êý--OpenThemeData¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£º
-    '    ²Î    Êý£º
-    '¡¡¡¡·µ »Ø Öµ£º
-    '    ±¸    ×¢£º
-    '¡¾APIº¯Êý--DrawThemeBackground¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£º
-    '    ²Î    Êý£º
-    '¡¡¡¡·µ »Ø Öµ£º
-    '    ±¸    ×¢£º
-    '¡¾APIº¯Êý--CloseThemeData¡¿
-    '    º¯ÊýÔ­ÐÍ£º
-    '    º¯Êý¹¦ÄÜ£º
-    '    ²Î    Êý£º
-    '¡¡¡¡·µ »Ø Öµ£º
-    '    ±¸    ×¢£º
+    ' Knowledge Points:
+    ' [API Function - OpenThemeData]
+    '    Function Prototype:
+    '    Function Purpose:
+    '    Parameters:
+    '    Return Value:
+    '    Remarks:
+    ' [API Function - DrawThemeBackground]
+    '    Function Prototype:
+    '    Function Purpose:
+    '    Parameters:
+    '    Return Value:
+    '    Remarks:
+    ' [API Function - CloseThemeData]
+    '    Function Prototype:
+    '    Function Purpose:
+    '    Parameters:
+    '    Return Value:
+    '    Remarks:
 DrawThemeError:
     DrawTheme = False
 End Function
@@ -2215,7 +2220,7 @@ Public Property Let EditType(ByVal NewValue As lgEditTypeEnum)
     PropertyChanged "EditType"
 End Property
 
-'¹¦ÄÜ£º´ÓÖ¸¶¨ÁÐ²éÕÒÓëËùÒªËÑË÷µÄÎÄ±¾ÏàÆ¥ÅäµÄµ¥Ôª¸ñ
+' Function: Find the cell in the specified column that matches the text to be searched.
 Public Function FindItem(ByVal SearchText As String, Optional ByVal SearchColumn As Long = 0, Optional SearchMode As lgSearchModeEnum = lgSMEqual, Optional MatchCase As Boolean) As Long
     'Search the specified Column for a Cell that matches the search text
     Dim lCount As Long
@@ -2223,43 +2228,43 @@ Public Function FindItem(ByVal SearchText As String, Optional ByVal SearchColumn
     
     FindItem = -1
     
-    'Èç¹ûÖ¸¶¨ÁËËÑË÷ÁÐºÍËÑË÷ÄÚÈÝ
+    ' If the search column and search content are specified:
     If (SearchColumn >= 0) And (Len(SearchText) > 0) Then
         If Not MatchCase Then
             SearchText = UCase$(SearchText)
         End If
         
         For lCount = LBound(mItems) To mItemCount
-            'Èç¹ûÑÏ¸ñÆ¥Åä£¬ÔòÈ¡³öµ¥Ôª¸ñµÄÔ­Ê¼ÎÄ±¾£»·ñÔòÈ¡³öÔ­Ê¼ÎÄ±¾ºó×ª»»Îª´óÐ©
+            'If strict matching is required, retrieve the original text of the cell; otherwise, retrieve
             If MatchCase Then
                 sCellText = mItems(mRowPtr(lCount)).Cell(SearchColumn).sValue
             Else
                 sCellText = UCase$(mItems(mRowPtr(lCount)).Cell(SearchColumn).sValue)
             End If
             
-            '²éÕÒÄ£Ê½
+            'Search mode:
             Select Case SearchMode
-            Case lgSMEqual                                                      'ÏàµÈ
+            Case lgSMEqual                                                      'ï¿½ï¿½ï¿½
                 If sCellText = SearchText Then
                     FindItem = lCount
                     Exit For
                 End If
                 
-            Case lgSMGreaterEqual                                               '´óÓÚµÈÓÚ
+            Case lgSMGreaterEqual                                               'ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½
                 If sCellText >= SearchText Then
                     FindItem = lCount
                     Exit For
                 End If
                 
-            Case lgSMLike                                                       'ÀàËÆ
+            Case lgSMLike                                                       'ï¿½ï¿½ï¿½ï¿½
                 If sCellText Like SearchText & "*" Then
                     FindItem = lCount
                     Exit For
                 End If
                 
-            Case lgSMNavigate                                                   'µ¼º½
+            Case lgSMNavigate                                                   'ï¿½ï¿½ï¿½ï¿½
                 If Len(sCellText) > 0 Then
-                    'µ¥Ôª¸ñÄÚÈÝ´óÓÚËÑË÷ÄÚÈÝÇÒµÚÒ»¸ö×Ö·ûÏàµÈ
+                    'The cell content is greater than the search content, and the first character is the same.
                     If (sCellText >= SearchText) And ((Mid$(sCellText, 1, 1)) = Mid$(SearchText, 1, 1)) Then
                         FindItem = lCount
                         Exit For
@@ -2674,7 +2679,7 @@ End Property
 Public Function ItemsVisible() As Long
     Dim lBorderWidth As Long
     
-    If mBorderStyle = ±ß¿ò Then lBorderWidth = 2
+    If mBorderStyle = ï¿½ß¿ï¿½ Then lBorderWidth = 2
     With UserControl
         ItemsVisible = (.ScaleHeight - GetColumnHeadingHeight() - (lBorderWidth * 2)) / GetRowHeight()
     End With
@@ -2688,49 +2693,48 @@ Public Property Get MouseRow() As Long
     MouseRow = mMouseRow
 End Property
 
-'¹¦ÄÜ£ºÒÆ¶¯±à¼­¿Ø¼þ
-'²ÎÊý£ºlgMoveControlEnum
+' Function: Move the edit control
+' Parameters: lgMoveControlEnum
 Private Sub MoveEditControl(ByVal MoveControl As lgMoveControlEnum)
     Dim r As RECT
     Dim lBorderWidth As Long
-    Dim nScaleMode As ScaleModeConstants                                        'ÉùÃ÷Ò»¸ö¶ÈÁ¿µ¥Î»³£Á¿
+    Dim nScaleMode As ScaleModeConstants                                        ' Declare a measurement unit constant
     Dim lHeight As Long
     
-    '¸ø±à¼­ÁÐ¼ÓÉÏ±ß¿ò
+    ' Add a border to the edit column
     SetColRect mEditCol, r
     
-    'Èç¹ûÁÐÃ»ÓÐ±»½Ø¶Ï£¬ÔòÁîÍâ±ß¿òµÄ×ó±ßÎ»ÖÃÒÆÖÁGridµÄ±ßÏß´¦
+    ' If the column is not truncated, move the outer border's left position to the grid's edge
     If Not IsColumnTruncated(mEditCol) Then
         r.Left = r.Left + mGridLineWidth
     End If
     
     On Local Error Resume Next
     
-    'Check if an external Control is used.
-    '¼ì²éÊÇ·ñÊ¹ÓÃÁËÍâ²¿¿Ø¼þ£¨¼´³ýTextBoxÍâµÄ¿Ø¼þ£©
+    ' Check if an external control is used.
     If mCols(mColPtr(mEditCol)).EditCtrl Is Nothing Then
-        'Using internal TextBox
+        ' Using internal TextBox
         With txtEdit
             .Left = r.Left
-            '¶¥²¿Î»ÖÃ=Ëù±à¼­ÐÐµÄÐÐµÄ¶¥²¿+±í¸ñÏßµÄ¿í¶È£¬¼´ÔÚ±í¸ñÏßµÄÏÂ·½
+            ' Top position = top of the row being edited + grid line width, i.e., below the grid line
             .Top = RowTop(mEditRow) + mGridLineWidth
-            '¸ß¶È=Ëù±àÐÐµÄ¸ß¶È-±í¸ñÏßµÄ¿í¶È
+            ' Height = height of the row being edited - grid line width
             .Height = mItems(mRowPtr(mEditRow)).lHeight - mGridLineWidth
             .Width = (r.Right - r.Left)
         End With
     Else
         nScaleMode = UserControl.Parent.ScaleMode
-        If mBorderStyle = ±ß¿ò Then
+        If mBorderStyle = Border Then
             lBorderWidth = 2
         End If
         
-        'Èç¹ûËù±à¼­ÁÐµÄ±à¼­¿Ø¼þÊÇComboBox
+        ' If the edit control for the column being edited is a ComboBox
         If (TypeOf mCols(mColPtr(mEditCol)).EditCtrl Is VB.ComboBox) Then
-            'ÉèÖÃ¿Ø¼þµÄLeft¡¢Top¡¢Width¡¢Height
+            ' Set the Left, Top, Width, and Height of the control
             With mCols(mColPtr(mEditCol)).EditCtrl
-                'UserControl.Extender.Left ÊôÐÔ£¬¿É¶Á¿ÉÐ´µÄÕûÐÍÖµ£¬ËüÊ¹ÓÃÈÝÆ÷µÄ¿Ì¶Èµ¥Î»Ö¸¶¨¿Ø¼þ×ó±ßÔµÏà¶ÔÓÚÈÝÆ÷×ó±ßÔµµÄÎ»ÖÃ¡£
-                'UserControl.Extender.Top  ÊôÐÔ£¬¿É¶Á¿ÉÐ´µÄÕûÐÍÖµ£¬ËüÊ¹ÓÃÈÝÆ÷µÄ¿Ì¶Èµ¥Î»Ö¸¶¨¿Ø¼þµÄÉÏ±ßÔµÏà¶ÔÓÚÈÝÆ÷ÉÏ±ßÔµµÄÎ»ÖÃ¡£
-                'ScaleX½«¿í¶ÈµÄ¶ÈÁ¿µ¥Î»´ÓÒ»ÖÖ×ª»»µ½ÁíÒ»ÖÖ
+                ' UserControl.Extender.Left property: A readable and writable integer value that specifies the position of the control's left edge relative to the container's left edge, using the container's scale units.
+                ' UserControl.Extender.Top property: A readable and writable integer value that specifies the position of the control's top edge relative to the container's top edge, using the container's scale units.
+                ' ScaleX converts the measurement unit of the width from one unit to another.
                 If mCols(mColPtr(mEditCol)).MoveControl And lgBCLeft Then
                     .Left = ScaleX(r.Left + lBorderWidth, vbPixels, nScaleMode) + UserControl.Extender.Left
                 End If
@@ -2740,14 +2744,14 @@ Private Sub MoveEditControl(ByVal MoveControl As lgMoveControlEnum)
                 If mCols(mColPtr(mEditCol)).MoveControl And lgBCWidth Then
                     .Width = ScaleX((r.Right - r.Left), vbPixels, nScaleMode)
                 End If
-                '2012.11.26, cdhigh commented£¬ÉèÖÃ¸ß¶È»áµ¼ÖÂComboµÚÒ»´ÎÏÔÊ¾Ê±ÄÚÈÝÏÔÊ¾²»È«
-                'È¡¶ø´úÖ®¾ÍÊÇÔÚ´°ÌåLoadÊÂ¼þÖÐÉèÖÃset Combo1.Font = GridOcx.Font
-                'If mCols(mColPtr(mEditCol)).MoveControl And lgBCHeight Then
-                    'TwipsPerPixel:     ·µ»ØË®Æ½ (TwipsPerPixelX) »ò´¹Ö± (TwipsPerPixelY) ¶ÈÁ¿µÄ¶ÔÏóµÄÃ¿Ò»ÏñËØÖÐµÄç¾Êý¡£
-                    'lHeight = mRowHeight / Screen.TwipsPerPixelX - mGridLineWidth - 4
-                    'Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, -1, ByVal lHeight)
-                    'Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, 0, ByVal lHeight)
-                'End If
+                ' 2012.11.26, cdhigh commented: Setting the height causes the ComboBox to not fully display its content the first time it is shown.
+                ' Instead, set Combo1.Font = GridOcx.Font in the form's Load event.
+                ' If mCols(mColPtr(mEditCol)).MoveControl And lgBCHeight Then
+                    ' TwipsPerPixel: Returns the number of twips per pixel for horizontal (TwipsPerPixelX) or vertical (TwipsPerPixelY) measurements.
+                    ' lHeight = mRowHeight / Screen.TwipsPerPixelX - mGridLineWidth - 4
+                    ' Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, -1, ByVal lHeight)
+                    ' Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, 0, ByVal lHeight)
+                ' End If
             End With
         Else
             With mCols(mColPtr(mEditCol)).EditCtrl
@@ -2822,7 +2826,7 @@ Private Property Get Orientation() As ScrollBarOrienationEnum
     SBOrientation = m_eOrientation
 End Property
 
-'@@@@@@@@@@@@@@@@@@@@@@[¹ö¶¯Ìõ²¿·Ö]@@@@@@@@@@@@@@@@@@@@-Start
+'@@@@@@@@@@@@@@@@@@@@@@[Scrollbar Section]@@@@@@@@@@@@@@@@@@@@-Start
 Private Sub pSBClearUp()
     If m_hWnd <> 0 Then
         On Error Resume Next
@@ -3161,12 +3165,10 @@ Public Sub RemoveItem(ByVal Index As Long)
     'See AddItem for details of the Arrays used
     '#############################################################################################################################
     
-    'Note selected state before deletion
-    'ÔÚÉ¾³ýÇ°±ê¼ÇÑ¡ÖÐ×´Ì¬
+    ' Note the selected state before deletion
     bSelected = mItems(mRowPtr(Index)).nFlags And lgFLSelected
     
-    'Decrement the reference count on each cells format Entry
-    '¸ù¾ÝÃ¿¸öµ¥Ôª¸ñµÄ¸ñÊ½»¯Èë¿Ú£¬¼õÉÙÒýÓÃ
+    ' Decrement the reference count on each cell's format entry
     If mItemCount >= 0 Then
         For lCount = 0 To UBound(mCols)
             If mItems(Index).Cell(Count).nFormat >= 0 Then
@@ -3177,18 +3179,17 @@ Public Sub RemoveItem(ByVal Index As Long)
     
     lPosition = mRowPtr(Index)
     
-    'Reset Item DataÖØÖÃÊý¾Ý
+    ' Reset item data
     For lCount = mRowPtr(Index) To mItemCount - 1
         mItems(lCount) = mItems(lCount + 1)
     Next lCount
     
-    'Adjust Indexµ÷ÕûË÷Òý
+    ' Adjust index
     For lCount = Index To mItemCount - 1
         mRowPtr(lCount) = mRowPtr(lCount + 1)
     Next lCount
     
-    'Validate Indexes for Items after deleted Item
-    'É¾³ýÑ¡ÏîºóÑéÖ¤Ë÷Òý
+    ' Validate indexes for items after the deleted item
     For lCount = 0 To mItemCount - 1
         If mRowPtr(lCount) > lPosition Then
             mRowPtr(lCount) = mRowPtr(lCount) - 1
@@ -3201,7 +3202,7 @@ Public Sub RemoveItem(ByVal Index As Long)
         Clear
     Else
         If (mItemCount + mCacheIncrement) < UBound(mItems) Then
-            'ÔÚ±£ÁôÔ­Êý¾ÝµÄÇé¿öÏÂÖØÐÂ¶¨ÒåÊý×é
+            ' Redefine the array while preserving the original data
             ReDim Preserve mItems(mItemCount)
             ReDim Preserve mRowPtr(mItemCount)
         End If
@@ -3553,7 +3554,7 @@ Private Function SetSelection(bState As Boolean, Optional lFromRow As Long = -1,
     SetSelection = bSelectionChanged
 End Function
 
-'@@@@@@@@@@@@@@@@@@@@@@[ÖµÅÅÐò²¿·Ö]@@@@@@@@@@@@@@@@@@@@-Start
+'@@@@@@@@@@@@@@@@@@@@@@[Value Sorting Section]@@@@@@@@@@@@@@@@@@@@-Start
 Private Sub SortArrayString(ByVal lFirst As Long, ByVal lLast As Long, lSortColumn As Long, ByVal nSortType As Integer)
 'Purpose: A simple data-type aware quick-sort method to Sort Grid Rows
     Dim lBoundary As Long
@@ -3792,7 +3793,7 @@ Private Function ToggleEdit() As Boolean
     End If
 End Function
 
-'ÊôÐÔ£ºÉèÖÃ×î¶¥ÐÐ
+' Property: Set the topmost row
 Public Property Let TopRow(ByVal NewValue As Long)
     If NewValue > SBMax(efsVertical) Then
         SBValue(efsVertical) = SBMax(efsVertical)
@@ -3803,7 +3804,7 @@ Public Property Let TopRow(ByVal NewValue As Long)
     SetRowCol NewValue, mCol, True
     DrawGrid mRedraw
 End Property
-'¹¦ÄÜ£º¸ú×ÙÊó±êÀë¿ª
+' Function: Track mouse leave
 Private Sub TrackMouseLeave(ByVal lng_hWnd As Long)
     Dim tme As TRACKMOUSEEVENT_STRUCT
     
@@ -3821,7 +3822,7 @@ Private Sub TrackMouseLeave(ByVal lng_hWnd As Long)
         End If
     End If
 End Sub
-'¹¦ÄÜ£ºÑÕÉ«×ª»»
+' Function: Color conversion
 Private Function TranslateColor(ByVal clrColor As OLE_COLOR, Optional hPalette As Long = 0) As Long
     If OleTranslateColor(clrColor, hPalette, TranslateColor) Then TranslateColor = &HFFFF
 End Function
@@ -3877,7 +3878,7 @@ Private Function UpdateCell() As Boolean
     UpdateCell = Not bCancel
 End Function
 
-'@@@@@@@@@@@@@@@@@@@@@@[ÓÃ»§¿Ø¼þ²¿·Ö]@@@@@@@@@@@@@@@@@@@@-Start
+'@@@@@@@@@@@@@@@@@@@@@@[User Control Section]@@@@@@@@@@@@@@@@@@@@-Start
 Private Sub UserControl_Click()
     If (mEditType And MouseClick) And (mMouseRow > -1) Then ToggleEdit
     RaiseEvent Click
@@ -3927,14 +3928,14 @@ Private Sub UserControl_InitProperties()
     
     mAlphaBlendSelection = False
     mDisplayEllipsis = True
-    mSelectMode = [ÐÐ]
+    mSelectMode = [ï¿½ï¿½]
     mFocusStyle = Heavy
     mGridLines = True
     mGridLineWidth = 1
     
     'Behaviour Properties
     mAllowResizing = Resize
-    mBorderStyle = ±ß¿ò
+    mBorderStyle = ï¿½ß¿ï¿½
     mCheckboxes = False
     mColumnDrag = False
     mColumnHeaders = True
@@ -4452,10 +4453,10 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
         mGridColor = .ReadProperty("GridColor", &HC0C0C0)
         
         mAlphaBlendSelection = .ReadProperty("AlphaBlendSelection", False)
-        mBorderStyle = .ReadProperty("BorderStyle", ±ß¿ò)
+        mBorderStyle = .ReadProperty("BorderStyle", ï¿½ß¿ï¿½)
         mDisplayEllipsis = .ReadProperty("DisplayEllipsis", True)
         mFocusColor = .ReadProperty("FocusColor", vbBlue)
-        mSelectMode = .ReadProperty("SelectMode", [ÐÐ])
+        mSelectMode = .ReadProperty("SelectMode", [ï¿½ï¿½])
         mFocusStyle = .ReadProperty("FocusStyle", Heavy)
         mGridLines = .ReadProperty("GridLines", True)
         mGridLineWidth = .ReadProperty("GridLineWidth", 1)
@@ -4547,9 +4548,9 @@ Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
         Call .WriteProperty("GridColor", mGridColor, &HC0C0C0)
         
         Call .WriteProperty("AlphaBlendSelection", mAlphaBlendSelection, False)
-        Call .WriteProperty("BorderStyle", mBorderStyle, ±ß¿ò)
+        Call .WriteProperty("BorderStyle", mBorderStyle, ï¿½ß¿ï¿½)
         Call .WriteProperty("DisplayEllipsis", mDisplayEllipsis, True)
-        Call .WriteProperty("SelectMode", mSelectMode, [ÐÐ])
+        Call .WriteProperty("SelectMode", mSelectMode, [ï¿½ï¿½])
         Call .WriteProperty("FocusColor", mFocusColor, vbBlue)
         Call .WriteProperty("FocusStyle", mFocusStyle, Heavy)
         Call .WriteProperty("GridLines", mGridLines, True)
@@ -4579,7 +4580,7 @@ Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
 End Sub
 '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-End
 
-'@@@@@@@@@@@@@@@@@@@@@@[×ÓÀà»¯²¿·Ö]@@@@@@@@@@@@@@@@@@@@-Start
+'@@@@@@@@@@@@@@@@@@@@@@[Subclassing Section]@@@@@@@@@@@@@@@@@@@@-Start
 Private Sub Subclass_AddMsg(ByVal lng_hWnd As Long, ByVal uMsg As Long, Optional ByVal When As eMsgWhen = MSG_AFTER)
     With sc_aSubData(zIdx(lng_hWnd))
         If (When And eMsgWhen.MSG_BEFORE) Then Call zAddMsg(uMsg, .aMsgTblB, .nMsgCntB, eMsgWhen.MSG_BEFORE, .nAddrSub)

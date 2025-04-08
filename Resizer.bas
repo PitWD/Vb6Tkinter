@@ -1,10 +1,10 @@
 Attribute VB_Name = "Resizer"
 Option Explicit
-'窗体控件随窗体大小而重排
+'Form controls resize with the form
 Private FormOldWidth As Long
 Private FormOldHeight As Long
 
-'在调用ResizeForm前先调用本函数
+'Call this function before calling ResizeForm
 Public Sub ResizeInit(FormName As Form)
     Dim Obj As Control
     FormOldWidth = FormName.ScaleWidth
@@ -16,7 +16,7 @@ Public Sub ResizeInit(FormName As Form)
     
 End Sub
 
-'按比例改变表单内各元件的大小，在调用ReSizeForm前先调用ReSizeInit函数
+'Change the size of all elements in the form proportionally, call ResizeInit function before calling ResizeForm
 Public Sub ResizeForm(FormName As Form)
     Dim pos() As String
     Dim i As Long, TempPos As Long, StartPos As Long
@@ -35,7 +35,7 @@ Public Sub ResizeForm(FormName As Form)
         ReDim pos(0) As String
         pos = Split(Obj.Tag, "|")
         If UBound(pos) >= 3 Then
-            If TypeName(Obj) = "ComboBox" Then 'ComboBox高度不能变
+            If TypeName(Obj) = "ComboBox" Then 'ComboBox height cannot change
                 Obj.Move CSng(pos(0)) * ScaleX, CSng(pos(1)) * ScaleY, CSng(pos(2)) * ScaleX
             Else
                 Obj.Move CSng(pos(0)) * ScaleX, CSng(pos(1)) * ScaleY, CSng(pos(2)) * ScaleX, CSng(pos(3)) * ScaleY
@@ -45,7 +45,7 @@ Public Sub ResizeForm(FormName As Form)
     
 End Sub
 
-'获取控件的设计时的宽度
+'Get the design-time width of the control
 Public Function GetOrignalWidth(ctl As Control) As Single
     
     Dim pos() As String, i As Long
@@ -60,7 +60,7 @@ Public Function GetOrignalWidth(ctl As Control) As Single
     
 End Function
 
-'获取控件的设计时的高度
+'Get the design-time height of the control
 Public Function GetOrignalHeight(ctl As Control) As Single
     
     Dim pos() As String, i As Long

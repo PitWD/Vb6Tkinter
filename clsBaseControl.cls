@@ -15,41 +15,41 @@ Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'实现所有控件类的公用代码，因为VB不支持真正的继承，所以其他控件类将内嵌这个类，而不是继承
+'Implements common code for all control classes. Since VB does not support true inheritance, other control classes will embed this class instead of inheriting it.
 
-Private m_dic As Dictionary                                                     '当前要生成代码的属性/值对
-Private m_Type As String                                                        '直接对应到PYTHON的控件类型
-Private m_Name As String                                                        '控件名
+Private m_dic As Dictionary                                                     'Current properties/values to generate code
+Private m_Type As String                                                        'Corresponding PYTHON control type
+Private m_Name As String                                                        'Control name
 Private m_Parent As String
-Private m_Value As String                                                       ' 控件值（如果有的话）
-Private m_StyleName As String                                                   '样式基类
+Private m_Value As String                                                       ' Control value (if any)
+Private m_StyleName As String                                                   'Style base class
 Private m_ScaleMode As Long
-Private m_vbWidgetInstance As Object                                            'VB控件的引用
+Private m_vbWidgetInstance As Object                                            'Reference to the VB control
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Generates PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handler callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, Optional sOtherParams As String = "")
     Dim s() As String, I As Long, extra As String
     Dim sTmp As String, sStyle As String, sCmdName As String, sUnderlineCmd As String
     
-    '有些控件只在tk里面存在，即使ttk启用，也不能应用样式
+    'Some controls only exist in tk, even if ttk is enabled, styles cannot be applied
     usettk = IIf(Len(m_StyleName), usettk, False)
     
-    '如果需要变量绑定，则先创建对应的变量
+    'If variable binding is needed, create the corresponding variable first
     If Len(Dic("textvariable")) Then
         sOut.Append "        self." & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
     End If
     If Len(Dic("variable")) Then
-        If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
+        If m_Type = "Radiobutton" Then  'The variable for a group of radio buttons is the same, do not create it repeatedly
             sTmp = "        self." & Dic("variable") & " = StringVar()"
             If Not sOut.ExistString(sTmp) Then
                 sOut.Append sTmp
             End If
-        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then '多选按钮/进度条的variable使用IntVar比较好
+        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then 'The variable for check buttons/progress bars is better to use IntVar
             sTmp = IIf(IsNumeric(m_Value), m_Value, "0")
             sOut.Append "        self." & Dic("variable") & " = IntVar(value=" & sTmp & ")"
         Else
@@ -74,16 +74,16 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self." & Dic("displaycolumns") & " = []    " & L("l_cmtTodoDisCols", "#TODO Add list of titles will be displayed, first column fixed for tree view.")
     End If
     
-    '组合框将displayrows转换为height属性
+    'Convert displayrows to height attribute for combo box
     If Len(Dic("displayrows")) Then
         sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "height=" & Dic("displayrows")
     End If
     
-    If usettk Then                                                              '创建STYLE对象
+    If usettk Then                                                              'Create STYLE object
         sStyle = GetStyleParams(usettk)
         If Len(sStyle) Then
             sOut.Append "        self.style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
-            If m_Type = "LabelFrame" Then ' LabelFrame的字体和前景色要设置到Label
+            If m_Type = "LabelFrame" Then ' LabelFrame's font and foreground color need to be set to Label
                 sOut.Append "        self.style.configure('T" & m_Name & "." & m_StyleName & ".Label" & "', " & sStyle & ")"
             End If
             sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
@@ -92,48 +92,48 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     
     extra = GetExtraParams(usettk)
     extra = extra & IIf(Len(extra) > 0 And Len(sOtherParams) > 0, ", ", "") & sOtherParams
-    '创建本控件实例
+    'Create this control instance
     sOut.Append "        self." & m_Name & " = " & m_Type & "(self." & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
     
-    '如果需要，给实例添加几个简单的“封装方法”方便访问textvariable，比如Entry的setText/text方法
+    'If needed, add a few simple "wrapper methods" to the instance for accessing textvariable, such as setText/text methods for Entry
     If Len(Dic("textvariable")) Then
         sOut.Append "        self." & m_Name & ".setText = lambda x: self." & Dic("textvariable") & ".set(x)"
         sOut.Append "        self." & m_Name & ".text = lambda : self." & Dic("textvariable") & ".get()"
-        'Entry/Text/Combobox里面的文本一般是不需要翻译的
+        'Text inside Entry/Text/Combobox generally does not need translation
         If m_Type <> "Entry" And m_Type <> "Text" And m_Type <> "Combobox" Then
             sI18n.Append "        self." & m_Name & ".setText(_(" & U(Dic("text")) & "))"
         End If
     End If
     
-    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如CheckButton的setValue/value方法
+    'If needed, add a few simple "wrapper methods" to the instance for accessing variable, such as setValue/value methods for CheckButton
     If Len(Dic("variable")) Then
-        If m_Type = "Radiobutton" Then '单选按钮
+        If m_Type = "Radiobutton" Then 'Radio button
             If Len(Dic("value")) Then
                 sOut.Append "        self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
                 sOut.Append "        self." & m_Name & ".value = lambda : 1 if self." & Dic("variable") & ".get() == " & Dic("value") & " else 0"
-                If m_vbWidgetInstance.Properties("Value") And Len(Dic("value")) Then '默认选择其中之一
+                If m_vbWidgetInstance.Properties("Value") And Len(Dic("value")) Then 'Select one by default
                     sOut.Append "        self." & m_Name & ".setValue(1)"
                 End If
             Else
                 sOut.Append "        self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
                 sOut.Append "        self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
             End If
-        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then  '多选按钮和进度条
+        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then  'Check button and progress bar
             sOut.Append "        self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
             sOut.Append "        self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
         End If
     End If
     
-    '如果设置了tooltip提示文本，则创建Tooltip实例
+    'If tooltip text is set, create Tooltip instance
     If Len(Dic("tooltip")) Then
         sOut.Append "        self." & m_Name & "Tooltip = Tooltip(self." & m_Name & ", " & Quote(Dic("tooltip")) & ")"
         sI18n.Append "        self." & m_Name & "Tooltip.text = _(" & Quote(Dic("tooltip")) & ")"
     End If
     
-    '放置控件
+    'Place control
     sOut.Append "        self." & m_Name & ".place(" & GetPositionParams(rel) & ")"
     
-    '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
+    'Create event handler function skeletons (if any), if the event contains a dot, it indicates calling a system function and does not need a function body
     If Len(Dic("command")) > 0 And InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
         sCmd.Append CreateFuncDefOOP(Dic("command"), "event=None")
     End If
@@ -141,7 +141,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sCmd.Append CreateFuncDefOOP(Dic("postcommand"), "event=None")
     End If
     
-    '处理下划线快捷方式
+    'Handle underline shortcuts
     If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And IsNumeric(Dic("underline")) Then
         If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
             sUnderlineCmd = "lambda e: self." & m_Name & ".focus_set() or self." & m_Name & ".invoke()"
@@ -165,16 +165,16 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         End If
     End If
     
-    If Len(Dic("bindcommand")) Then                                             '有需要使用bind语句绑定的其他事件处理
+    If Len(Dic("bindcommand")) Then                                             'Other event handlers that need to use bind statements
         sTmp = Dic("bindcommand")
-        sTmp = Replace(sTmp, "'", "")                                           '自动去掉括号和空格，如果有的话
+        sTmp = Replace(sTmp, "'", "")                                           'Automatically remove brackets and spaces if any
         sTmp = Replace(sTmp, Chr(34), "")
         sTmp = Replace(sTmp, " ", "")
         
         s = Split(sTmp, ",")
         For I = 0 To UBound(s)
             s(I) = Trim(s(I))
-            If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+            If s(I) = "<Change>" Then 'Specially handle this custom event, use control variable monitoring to simulate
                 If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
                     sCmdName = m_Name & "_Change"
                     sOut.Append "        self." & Dic("textvariable") & ".trace('w', self." & sCmdName & ")"
@@ -187,15 +187,15 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
                 sOut.Append "        self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                 sCmd.Append CreateFuncDefOOP(sCmdName, "event")
                 
-                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+                'Python is case-sensitive, the corresponding shortcuts are the same. If the set shortcut contains letter keys, bind the corresponding uppercase/lowercase together
                 If Right(s(I), 3) >= "-a>" And Right(s(I), 3) <= "-z>" Then
                     
-                    s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变大写
+                    s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" 'Change to uppercase
                     sOut.Append "        self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                     
                 ElseIf Right(s(I), 3) >= "-A>" And Right(s(I), 3) <= "-Z>" Then
                     
-                    s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变小写
+                    s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" 'Change to lowercase
                     sOut.Append "        self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                     
                 End If
@@ -205,24 +205,24 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     
 End Sub
 
-'根据rel(是否采用相对坐标)，生成对应的控件位置信息
+'Generates the corresponding control position information based on rel (whether to use relative coordinates)
 Public Function GetPositionParams(rel As Boolean) As String
     If rel Then
         GetPositionParams = "relx=" & Commas2Points(Dic("relx")) & ", rely=" & Commas2Points(Dic("rely")) & _
             ", relwidth=" & Commas2Points(Dic("relwidth"))
-        If m_Type <> "Combobox" Then 'Combobox不需要设置height属性
+        If m_Type <> "Combobox" Then 'Combobox does not need to set the height attribute
             GetPositionParams = GetPositionParams & ", relheight=" & Commas2Points(Dic("relheight"))
         End If
     Else
         GetPositionParams = "x=" & Commas2Points(Dic("x")) & ", y=" & Commas2Points(Dic("y")) & _
             ", width=" & Commas2Points(Dic("width"))
-        If m_Type <> "Combobox" Then 'Combobox不需要设置height属性
+        If m_Type <> "Combobox" Then 'Combobox does not need to set the height attribute
             GetPositionParams = GetPositionParams & ", height=" & Commas2Points(Dic("height"))
         End If
     End If
 End Function
 
-'除了必选参数外，这个函数生成用户选择的其他参数列表
+'Generates a list of optional parameters selected by the user, in addition to the required parameters
 Public Function GetExtraParams(usettk As Boolean) As String
     
     Dim cfg As Variant, k As Variant, ks As Variant, sValue As String, s As New cStrBuilder
@@ -231,10 +231,10 @@ Public Function GetExtraParams(usettk As Boolean) As String
     
     For Each k In ks
         If isExtra(k, usettk) And Len(Dic(k)) Then
-            '需要使用引号括起来的属性，如果用户忘了，则在这里自动添加
+            'Attributes that need to be enclosed in quotes. If the user forgets, add them here automatically
             If k = "text" Or k = "label" Then
-                If m_Type = "Entry" And Len(Dic("textvariable")) > 0 And usettk Then 'ttk模式下Entry使用textvariable显示字符，而不是使用text属性
-                    '忽略text属性
+                If m_Type = "Entry" And Len(Dic("textvariable")) > 0 And usettk Then 'In ttk mode, Entry uses textvariable to display characters instead of using the text attribute
+                    'Ignore the text attribute
                     sValue = ""
                 Else
                     sValue = U(Dic(k))
@@ -267,32 +267,32 @@ Public Function GetExtraParams(usettk As Boolean) As String
     If Len(Dic("values")) Then s.Append "values=self." & Dic("values")
     
     If Len(Dic("command")) Then
-        If InStr(1, Dic("command"), "lambda ") > 0 Then '匿名函数，不用加self.
+        If InStr(1, Dic("command"), "lambda ") > 0 Then 'Anonymous function, no need to add self.
             s.Append "command=" & Dic("command")
         Else
             s.Append "command=self." & Dic("command")
         End If
     End If
-    
-    If Len(Dic("postcommand")) Then s.Append "postcommand=self." & Dic("postcommand")
-    If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=self." & Dic("xscrollcommand")
-    If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=self." & Dic("yscrollcommand")
-    If Len(Dic("font")) Then
-        If usettk Then 'TTK模式的大多数控件的font一般都要写在样式里面，但Entry/Combobox的font要写在创建函数中才管用
-            If m_Type = "Entry" Or m_Type = "Combobox" Then
-                s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")") '自动加括号
-            End If
-        Else
-            s.Append "font=self." & m_Name & "Font"
+
+If Len(Dic("postcommand")) Then s.Append "postcommand=self." & Dic("postcommand")
+If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=self." & Dic("xscrollcommand")
+If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=self." & Dic("yscrollcommand")
+If Len(Dic("font")) Then
+    If usettk Then 'In TTK mode, most control fonts are written in styles, but the fonts for Entry/Combobox need to be written in the creation function
+        If m_Type = "Entry" Or m_Type = "Combobox" Then
+            s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")") 'Automatically add parentheses
         End If
+    Else
+        s.Append "font=self." & m_Name & "Font"
     End If
-    
-    GetExtraParams = s.toString(", ")
+End If
+
+GetExtraParams = s.toString(", ")
 End Function
 
-'判断一个属性是否是额外参数，会根据TTK来判断更多的属性
+'Determines whether an attribute is an extra parameter, more attributes are considered based on TTK
 Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
-    '在这两个字符串列表中属性都不是额外参数，除此之外的是额外参数
+    'Attributes in these two string lists are not extra parameters, the rest are extra parameters
     Const NOT_EXTRA_STRING As String = ",x,y,relx,rely,width,height,relwidth,relheight,command,bindcommand,xscrollcommand," & _
         "yscrollcommand,postcommand,font,textvariable,variable,listvariable,values,displayrows,columns,displaycolumns,tooltip,"
     Const NOT_EXTRA_STRING_TTK As String = NOT_EXTRA_STRING & ",fg,bg,bd,relief,activerelief,overrelief,anchor,jump,indicatoron,resolution,digits," & _
@@ -305,7 +305,7 @@ Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
     End If
 End Function
 
-'如果使用了TTK扩展，使用这个函数获取TTK相关参数并创建合法的字符参数列表
+'If TTK extension is used, use this function to get TTK related parameters and create a valid string parameter list
 Private Function GetStyleParams(usettk As Boolean) As String
     Dim s As New cStrBuilder
     
@@ -319,11 +319,11 @@ Private Function GetStyleParams(usettk As Boolean) As String
     If Len(Dic("jump")) Then s.Append "jump=" & Dic("jump")
     If Len(Dic("indicatoron")) Then s.Append "indicatoron=" & Dic("indicatoron")
     If Len(Dic("font")) Then
-        'ttk.Entry的font要写在构建函数中才管用,ttk.LabelFrame的font要设置到.Label属性才管用
+        'For ttk.Entry, font must be written in the constructor to be effective, for ttk.LabelFrame, the font must be set to the .Label property to be effective
         If m_Type <> "Entry" And m_Type <> "Combobox" Then
             If Left$(Dic("font"), 1) = "(" Then
                 s.Append "font=" & Dic("font")
-            Else  '如果用户忘了加括号，这里加上
+            Else  'If the user forgot to add parentheses, add them here
                 s.Append "font=(" & Dic("font") & ")"
             End If
         End If
@@ -338,8 +338,8 @@ Private Function GetStyleParams(usettk As Boolean) As String
     
 End Function
 
-'根据代码模块中的函数声明，自动填写bindcommand域
-'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+'Automatically fills the bindcommand field based on function declarations in the code module
+'dMethods: Dictionary with control names as keys and control event handler function names as comma-separated strings
 Public Function GetBindCommandStr(dMethods As Dictionary) As String
     Dim s As String, sOut As cStrBuilder
     If Not dMethods.Exists(m_Name) Then Exit Function
@@ -347,7 +347,7 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
     Set sOut = New cStrBuilder
     s = dMethods.Item(m_Name)
     
-    '这几个控件的Click事件由command属性设置比较好，不需要bind
+    'For these controls, the Click event is better set by the command attribute, no need to bind
     If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
         If InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     ElseIf m_Type = "Listbox" Then
@@ -371,7 +371,7 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
     If InStr(1, s, "," & m_Name & "_Leave,") > 0 Then sOut.Append "<Leave>"
     
     If m_Type <> "Combobox" And m_Type <> "Text" And InStr(1, s, "," & m_Name & "_Change,") > 0 Then
-        sOut.Append "<Change>"  '这个事件由内部处理，不是标准tk事件
+        sOut.Append "<Change>"  'This event is handled internally, not a standard tk event
     End If
     
     If m_Type = "Treeview" Then
@@ -389,7 +389,7 @@ Public Function IsExistCommand(dMethods As Dictionary, cmdTxt As String) As Bool
     If dMethods.Exists(m_Name) Then IsExistCommand = (InStr(1, dMethods.Item(m_Name), "," & m_Name & "_" & cmdTxt & ",") > 0)
 End Function
 
-'设置/获取字典的值，Dic()为clsBaseControl的默认属性'Attribute Dic.VB_UserMemId = 0'
+'Set/Get the value of the dictionary, Dic() is the default property of clsBaseControl 'Attribute Dic.VB_UserMemId = 0'
 Public Property Get Dic(ByVal sKey As String) As String
 Attribute Dic.VB_UserMemId = 0
     If m_dic.Exists(sKey) Then Dic = m_dic(sKey)
@@ -403,7 +403,7 @@ Public Sub Remove(ByVal sKey As String)
     m_dic.Remove (sKey)
 End Sub
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     If m_dic.Exists(sAttr) Then
         hasAttribute = True
@@ -412,16 +412,16 @@ Public Function hasAttribute(sAttr As String) As Boolean
     End If
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     If m_dic.Exists(sAttr) Then
-        GetAttrCurrentValue = m_dic(sAttr) & "" '连接空串是为了能自动转换其他类型为字符串
+        GetAttrCurrentValue = m_dic(sAttr) & "" 'Concatenating with an empty string to automatically convert other types to string
     Else
         GetAttrCurrentValue = ""
     End If
 End Function
 
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+'Update the configuration selected by the user to the object, the parameter is many attribute/value pairs separated by "|"
 Public Sub SetConfig(sAttrs As String)
     Dim sa() As String, I As Long
     
@@ -436,8 +436,7 @@ Public Sub SetConfig(sAttrs As String)
     
 End Sub
 
-
-'修改或增加单个配置项，属性/值由"|"分隔
+'Modify or add a single configuration item, attribute/value separated by "|"
 Public Sub SetSingleConfig(sAttr As String)
     Dim sa() As String
     sa = Split(sAttr, "|")
@@ -445,9 +444,9 @@ Public Sub SetSingleConfig(sAttr As String)
     m_dic(sa(0)) = sa(1)
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 1
     Select Case sAttr
@@ -474,7 +473,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
             
 End Function
 
-'返回属性在线帮助
+'Return attribute online help
 Public Function Tips(sAttr As String) As String
     
     Tips = sAttr & vbCrLf
@@ -512,33 +511,33 @@ Public Function Tips(sAttr As String) As String
     Case "underline":
         Tips = Tips & L("l_TipUnderline", "If nonnegative, the corresponding text character will be underlined, index of first char is 0.")
     Case "justify":
-        Tips = Tips & L("l_TipJustify", "How the (Multiline) text are justified: 'left','right','center'")
+        Tips = Tips & L("l_TipJustify", "How the (Multiline) text is justified: 'left','right','center'")
     Case "padding":
         Tips = Tips & L("l_TipPadding", "Specifies the amount of extra space to add around the outside of the widget.")
     Case "orient":
         Tips = Tips & L("l_TipOrient", "One of 'horizontal' or 'vertical'. Specifies the orientation of the widget.")
     Case "cursor":
-        Tips = Tips & L("l_TipCursor", "cursor of widget. Choose a curor embeddin in tk, or add a prefix '@' in a filename to use a custom cursor, for example '@custom.cur'.")
+        Tips = Tips & L("l_TipCursor", "Cursor of widget. Choose a cursor embedded in tk, or add a prefix '@' in a filename to use a custom cursor, for example '@custom.cur'.")
     Case "variable":
         Tips = Tips & L("l_TipVariable", "The control variable that tracks the current state/value of the widget.")
     Case "textvariable":
         Tips = Tips & L("l_TipTextVariable", "The control variable that tracks the current text displayed of the widget.")
     Case "command":
-        Tips = Tips & L("l_TipCommand", "A procedure to be called when the widget is activated or clicked. can be set to 'top.destroy' and other method of tk or lambda function too.")
+        Tips = Tips & L("l_TipCommand", "A procedure to be called when the widget is activated or clicked. Can be set to 'top.destroy' and other methods of tk or lambda function too.")
     Case "bindcommand":
-        Tips = Tips & L("l_TipBindCommand", "Used to attach events binding to a widget. for example:<Control-C>,<F8>,<Alt-A>.")
+        Tips = Tips & L("l_TipBindCommand", "Used to attach events binding to a widget. For example: <Control-C>, <F8>, <Alt-A>.")
     Case "font":
-        Tips = Tips & L("l_TipFont", "Font to be used for widget. is a tuple, the first two elements is name, size, the following are some of 'bold', 'italic', 'underline', 'overstrike'.")
+        Tips = Tips & L("l_TipFont", "Font to be used for the widget. It is a tuple, the first two elements are name and size, the following are some of 'bold', 'italic', 'underline', 'overstrike'.")
     Case "xscrollcommand":
         Tips = Tips & L("l_TipXScrlCmd", "If widget is scrollable, this attribute should be the .set() method of the horizontal scrollbar.")
     Case "yscrollcommand":
         Tips = Tips & L("l_TipYScrlCmd", "If widget is scrollable, this attribute should be the .set() method of the vertical scrollbar.")
     Case "xscrollincrement":
-        Tips = Tips & L("l_TipXScrlIncre", "Default is 0, If set a positive value, widget can be positioned only on multiples of that distance.")
+        Tips = Tips & L("l_TipXScrlIncre", "Default is 0, if set to a positive value, the widget can be positioned only on multiples of that distance.")
     Case "yscrollincrement":
-        Tips = Tips & L("l_TipYScrlIncre", "Default is 0, If set a positive value, widget can be positioned only on multiples of that distance.")
+        Tips = Tips & L("l_TipYScrlIncre", "Default is 0, if set to a positive value, the widget can be positioned only on multiples of that distance.")
     Case "scrollregion"
-        Tips = Tips & L("l_TipScrlregion", "A tuple (w, n, e, s) that defnes over how large an area the canvas can be scrolled.")
+        Tips = Tips & L("l_TipScrlregion", "A tuple (w, n, e, s) that defines over how large an area the canvas can be scrolled.")
     Case "confine"
         Tips = Tips & L("l_TipConfine", "If true (the default), the canvas cannot be scrolled outside of the scrollregion.")
     Case "highlightbackground"
@@ -548,11 +547,11 @@ Public Function Tips(sAttr As String) As String
     Case "highlightthickness"
         Tips = Tips & L("l_TipHlThickness", "Thickness of the focus highlight. The default value is 1.")
     Case "selectbackground"
-        Tips = Tips & L("l_TipSltbg", "The background color to use displaying selected items.")
+        Tips = Tips & L("l_TipSltbg", "The background color to use when displaying selected items.")
     Case "selectborderwidth"
         Tips = Tips & L("l_TipSltbd", "The width of the border to use around selected items.")
     Case "selectforeground"
-        Tips = Tips & L("l_TipSltfg", "The foreground color to use displaying selected items.")
+        Tips = Tips & L("l_TipSltfg", "The foreground color to use when displaying selected items.")
     Case "tooltip"
         Tips = Tips & L("l_TipTooltip", "The tooltip text of the widget.")
     Case Else:
@@ -560,27 +559,27 @@ Public Function Tips(sAttr As String) As String
     End Select
 End Function
 
-'设置对应的tkinter控件类名
+'Set the corresponding tkinter control class name
 Public Property Let ctlType(sType As String)
     m_Type = sType
 End Property
 
-'获取对应的tkinter控件类名
+'Get the corresponding tkinter control class name
 Public Property Get ctlType() As String
     ctlType = m_Type
 End Property
 
-'设置控件的父窗口，默认是top
+'Set the parent window of the control, default is top
 Public Property Let Parent(s As String)
     m_Parent = s
 End Property
 
-'返回控件的父窗口，默认是top
+'Return the parent window of the control, default is top
 Public Property Get Parent() As String
     Parent = m_Parent
 End Property
 
-'类实例所代表的控件类的名字
+'The name of the control class represented by the class instance
 Public Property Get Name() As String
     Name = m_Name
 End Property
@@ -603,7 +602,7 @@ Public Property Get ScaleMode() As Long
     ScaleMode = m_ScaleMode
 End Property
 
-'对象序列化函数
+' Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_dic
 End Function
@@ -630,7 +629,7 @@ Private Sub Class_Initialize()
     Set m_dic = New Dictionary
 End Sub
 
-'构建一个函数空骨架; FuncName: 函数名，Params: 参数，sbody: 函数体
+'Construct a function skeleton; FuncName: function name, Params: parameters, sbody: function body
 Public Function CreateFuncDef(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
     Dim txtMod As String, widgetName As String
     If Len(funcName) = 0 Then Exit Function
@@ -653,7 +652,7 @@ Public Function CreateFuncDef(funcName As String, Optional sparams As String = "
     End If
 End Function
 
-'构建一个函数空骨架（面向对象代码）; FuncName: 函数名，Params: 参数，sbody: 函数体
+'Construct a function skeleton (object-oriented code); FuncName: function name, Params: parameters, sbody: function body
 Public Function CreateFuncDefOOP(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
     Dim txtMod As String, widgetName As String
     If Len(funcName) = 0 Then Exit Function
@@ -676,8 +675,7 @@ Public Function CreateFuncDefOOP(funcName As String, Optional sparams As String 
     End If
 End Function
 
-
-'将各种单位转换为像素
+'Convert various units to pixels
 Public Function toPixelX(nX As Long) As Long
     If m_ScaleMode = vbTwips Then
         toPixelX = Twip2PixelX(nX)
@@ -698,7 +696,7 @@ Public Function toPixelY(nY As Long) As Long
     End If
 End Function
 
-'将VB的鼠标指针值翻译为tkinter的鼠标指针名
+'Translate VB mouse pointer values to tkinter mouse pointer names
 Public Function GetCursorName(nCursor As Long) As String
     Select Case nCursor
         Case vbArrow: GetCursorName = "'arrow'"
@@ -724,7 +722,7 @@ Public Function Commas2Points(ByVal InS As String) As String
     Commas2Points = Replace(InS, ",", ".")
 End Function
 
-'设置VB控件的引用
+'Set the reference to the VB control
 Public Sub SetVbWidgetInstance(ByRef o As Object)
     Set m_vbWidgetInstance = o
 End Sub

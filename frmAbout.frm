@@ -26,7 +26,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAbout2 
       Caption         =   "Visit <https://github.com/cdhigh/Vb6Tkinter> for more detailed information"
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -44,7 +44,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAbout1 
       Caption         =   "With Vb6Tkinter, you can create your Tkinter UI in the most intuitive way"
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -62,7 +62,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAboutAuthor 
       Caption         =   "Made by cdhigh"
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -80,7 +80,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAboutVer 
       Caption         =   "Vb6Tkinter v1.7.0"
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   14.25
          Charset         =   134
          Weight          =   700
@@ -106,7 +106,7 @@ Option Explicit
 Private Sub Form_Load()
     lblAboutVer.Caption = "Vb6Tkinter v" & g_AppVerString
     
-    '多语种支持
+    'Multilingual support
     Me.Caption = L(Me.Name, Me.Caption)
     lblAboutAuthor.Caption = L("lblAboutAuthor", "Made by cdhigh")
     lblAbout1.Caption = L("lblAbout1", "With Vb6Tkinter, you can create your Tkinter UI in the most intuitive way")

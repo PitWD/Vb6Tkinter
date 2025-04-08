@@ -15,21 +15,21 @@ Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'滚动条类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
+'Scrollbar class, used to set and maintain corresponding properties and values, and generate corresponding PYTHON TKinter code
 
-Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
-Private m_Base As clsBaseControl                                                '基础控件类
+Private m_dicTotal As Dictionary        'Store all properties, including default values
+Private m_Base As clsBaseControl        'Base control class
 Private m_CanbeOutByMainForm As Boolean
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handling callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     Dim cmdTxt As String
-    '滚动条的命令绑定额外处理
+    'Special handling for the command binding of the scrollbar
     cmdTxt = m_Base("command")
     If Len(cmdTxt) Then
         sCmd.Append m_Base.CreateFuncDefOOP(cmdTxt, "method, dir, jump=None")
@@ -39,7 +39,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     m_Base("command") = cmdTxt
 End Sub
 
-'创建对象后要马上调用这个函数初始化各参数
+'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     Dim s As String, sa() As String, I As Long, idx As Long
     
@@ -67,7 +67,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("command") = "" 'o.Properties("Name") & "_Cmd"
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
-    '这些是默认选择的
+    'These are the default selections
     m_Base("x") = m_dicTotal("x")
     m_Base("y") = m_dicTotal("y")
     m_Base("width") = m_dicTotal("width")
@@ -82,8 +82,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
-    '使用控件的tag属性保存一些额外默认要保存的属性，
-    '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
+    'Use the control's tag property to save some additional default properties,
+    'Start character: p@, followed by property name, each property is separated by @, property value is optional, if there is a value, use k=v format
     s = Trim(o.Properties("Tag"))
     If Len(s) Then
         sa = Split(s, "@")
@@ -91,10 +91,10 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
             For I = 1 To UBound(sa)
                 s = sa(I)
                 idx = InStr(2, s, "=")
-                If idx > 0 Then '有值
+                If idx > 0 Then 'Has value
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
                     m_Base(Left$(s, idx - 1)) = m_dicTotal(Left$(s, idx - 1))
-                ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then '仅有属性，则判断属性是否合法
+                ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then 'Only property, check if property is valid
                     m_Base(s) = m_dicTotal(s)
                 End If
             Next
@@ -102,9 +102,9 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     End If
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 1
     If sAttr = "jump" Then
@@ -116,24 +116,24 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     hasAttribute = m_Base.hasAttribute(sAttr)
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
-    Select Case sAttr:
+    Select Case sAttr
     Case "jump"
         Tips = Tips & L("l_TipJump", "Set to 1, the callback isn't called until the user releases the mouse button.")
     Case "activerelief"
         Tips = Tips & L("l_TipActiveRelief", "To display the slider with a different relief style when the mouse is over the slider.")
-    Case Else:
+    Case Else
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function
@@ -146,14 +146,14 @@ Private Sub Class_Initialize()
     m_CanbeOutByMainForm = True
 End Sub
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     Dim re As Collection, k As Variant, ks As Collection
     
     Set re = New Collection
     
-    '标准参数
+    'Standard parameters
     Set ks = m_dicTotal.Keys
     For Each k In ks
         If Len(m_Base(k)) Then
@@ -163,7 +163,7 @@ Public Function Allitems() As Collection
         End If
     Next
     
-    '用户增加的自定义参数（如果有的话）
+    'User-added custom parameters (if any)
     Set ks = m_Base.Keys
     For Each k In ks
         If Not m_dicTotal.Exists(k) Then
@@ -200,13 +200,13 @@ Public Property Get Name() As String
     Name = m_Base.Name
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     m_Base.ctlType = sType
     m_Base.StyleName = sStyleName
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = m_CanbeOutByMainForm
 End Property
@@ -214,7 +214,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
     m_CanbeOutByMainForm = bEnable
 End Property
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
 End Function
@@ -231,28 +231,28 @@ Public Property Let ScaleMode(nV As Long)
     m_Base.ScaleMode = nV
 End Property
 
-'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
-'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
-'返回值含义：
-'<0：表示本对象需要在另一个对象前输出代码
-'=0：表示两者将没有依赖关系，代码前后顺序无影响
-'>0：另一个对象要先输出代码。
-'整体的逻辑结果类似是重的沉底
+'Function used to simulate compare sorting, actually to determine the dependency relationship between two objects
+'Compare this object with another object, logical result is 'this object - another object'
+'Return value meaning:
+'<0: indicates that this object needs to output code before another object
+'=0: indicates that there is no dependency relationship between the two, code order is not affected
+'>0: another object needs to output code first.
+'The overall logical result is similar to heavier items sinking to the bottom
 Public Function Compare(ByRef Obj As Object) As Long
     Dim tObj As String
     tObj = TypeName(Obj)
-    '如果是可滚动控件和滚动条相比较，则交给可滚动对象来比较
+    'If comparing a scrollable control with a scrollbar, leave it to the scrollable object to compare
     If tObj = "clsListbox" Or tObj = "clsText" Or tObj = "clsCanvas" Or tObj = "clsTreeview" Then
         Compare = Obj.Compare(Me)
-        Compare = Switch(Compare > 0, -1, Compare < 0, 1, Compare = 0, 0) '比较结果要反个个
+        Compare = Switch(Compare > 0, -1, Compare < 0, 1, Compare = 0, 0) 'Reverse the comparison result
         Exit Function
     End If
     
-    If Parent = Obj.Name Then '父控件先输出代码
+    If Parent = Obj.Name Then 'Parent control outputs code first
         Compare = 1
     ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then 'Top-level controls output first
         Compare = -1
     ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1

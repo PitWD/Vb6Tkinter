@@ -15,12 +15,12 @@ Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'对象持续化类
+'Object persistence class
 Private mInnerArray() As String
 Private mInnerArrayItems As Long
 Private mInnerArrayCur As Long
 
-'设置要解码的字符串
+'Set the string to decode
 Public Property Let SerialString(newStr As String)
     ResetStrArray
     mInnerArray = Split(newStr, vbCrLf)
@@ -42,7 +42,7 @@ Public Sub Serializer(ParamArray vObjs() As Variant)
     For i = LBound(vObjs) To UBound(vObjs)
         Dim tType As String
         tType = GetType(vObjs(i))
-        SaveData tType                                                          'Save Type
+        SaveData tType 'Save Type
         
         Select Case tType
         Case "Object"

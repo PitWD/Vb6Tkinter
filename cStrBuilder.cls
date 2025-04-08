@@ -15,7 +15,7 @@ Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'用法
+'Usage
 'dim ss as cStrBuilder
 'set ss = new cStrBuilder
 's.Append "test"
@@ -53,7 +53,7 @@ Private Sub Class_Terminate()
     Reset
 End Sub
 
-'判断一个字符串是否已经存在，这个是判断每次append进来的整个字符串，而不是判断子字符串
+'Check if a string already exists. This checks the entire string that is appended each time, not sub-strings.
 Public Function ExistString(s As String) As Boolean
     Dim i As Long, nLen As Long
     nLen = Len(s)

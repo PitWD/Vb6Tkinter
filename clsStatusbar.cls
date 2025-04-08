@@ -13,14 +13,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'状态栏类，因为TK和TTK库都没有状态栏控件，这里自己实现一个状态栏控件
+'Statusbar class, since both TK and TTK libraries do not have a statusbar control, we implement a statusbar control here
 
-'一个简单的状态栏python控件类定义，因为VB不允许太多的续行符，所以分成两部分，在程序中再连接起来
-'此控件的使用方法：
-'  statusbar = Statusbar(top)  #创建仅有一个窗格的状态栏
-'  statusbar = Statusbar(top, slots=[30,10,]) #创建三个窗格，前两个宽度分别为30,10像素，第三个占据剩余空间
-'  statusbar.pack(side=BOTTOM, fill=X)   #放置在窗体最下面
-'  statusbar.set(0,'Demo mode')  #设置第一个窗格的内容
+'A simple statusbar python control class definition, as VB does not allow too many continuation characters, it is divided into two parts and then connected in the program
+'Usage of this control:
+'  statusbar = Statusbar(top)  #Create a statusbar with only one pane
+'  statusbar = Statusbar(top, slots=[30,10,]) #Create three panes, the first two with widths of 30, 10 pixels respectively, and the third occupying the remaining space
+'  statusbar.pack(side=BOTTOM, fill=X)   #Place at the bottom of the form
+'  statusbar.set(0,'Demo mode')  #Set the content of the first pane
 Const DefineStatusbar1  As String = "class Statusbar(Frame):" & vbCrLf & _
 "    """ & """" & """A Simple Statusbar" & vbCrLf & _
 "    Usage:self.status = Statusbar(self.top, panelwidths=(15,5,))" & vbCrLf & _
@@ -30,7 +30,7 @@ Const DefineStatusbar1  As String = "class Statusbar(Frame):" & vbCrLf & _
 "    """ & """" & """" & vbCrLf & _
 "    def __init__(self, master, **kw):" & vbCrLf & _
 "        """ & """" & """Options:" & vbCrLf & _
-"        panelwidths - a tuple of width of panels, atual number of panels is len(panelwidths)+1." & vbCrLf & _
+"        panelwidths - a tuple of width of panels, actual number of panels is len(panelwidths)+1." & vbCrLf & _
 "        """ & """" & """" & vbCrLf
 
 Const DefineStatusbar2 As String = vbCrLf & _
@@ -63,8 +63,8 @@ Const DefineStatusbar3 As String = "    def set(self, panel, format, *args):" & 
 Private m_Base As clsBaseControl
 Private m_CanbeOutByMainForm As Boolean
 
-'输出状态栏控件的定义
-'OutOnlyV3: True-仅输出Python3代码，False-输出兼容Python2/3的代码
+'Output the definition of the statusbar control
+'OutOnlyV3: True-Output only Python3 code, False-Output code compatible with Python2/3
 Public Property Get WidgetCode(OutOnlyV3 As Boolean) As String
     Dim sInit As String
     If OutOnlyV3 Then
@@ -75,12 +75,12 @@ Public Property Get WidgetCode(OutOnlyV3 As Boolean) As String
     WidgetCode = DefineStatusbar1 & sInit & DefineStatusbar2 & DefineStatusbar3
 End Property
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handling callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     
     sOut.Append "        self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
@@ -96,12 +96,12 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
             m_Base("rely") & ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
     Else
-        sOut.Append "        self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
-            ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
+        sOut.Append "        self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & _
+            m_Base("y") & ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
     End If
 End Sub
 
-'创建对象后要马上调用这个函数初始化各参数
+'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim I As Long, nCnt As Long, s As String, Panels As IPanels
@@ -143,8 +143,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         End If
     End If
     
-    '使用控件的tag属性保存一些额外默认要保存的属性，
-    '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
+    'Use the control's tag property to save some additional default properties,
+    'Start character: p@, followed by property name, each property is separated by @, property value is optional, if there is a value, use k=v format
     s = Trim(o.Properties("Tag"))
     If Len(s) Then
         sa = Split(s, "@")
@@ -152,7 +152,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
             For I = 1 To UBound(sa)
                 s = sa(I)
                 idx = InStr(2, s, "=")
-                If idx > 0 Then '有值
+                If idx > 0 Then 'Has value
                     m_Base(Left$(s, idx - 1)) = Mid$(s, idx + 1)
                 End If
             Next
@@ -160,9 +160,9 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     End If
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     If sAttr = "side" Then
         GetAttrValueList = 2
@@ -172,12 +172,12 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     hasAttribute = m_Base.hasAttribute(sAttr)
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
@@ -194,7 +194,7 @@ Public Function Tips(sAttr As String) As String
     
 End Function
 
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+'Update the configuration selected by the user to the object, the parameter is many attribute/value pairs separated by "|"
 Public Sub SetConfig(sAttrs As String)
 
     Dim sa() As String, I As Long
@@ -210,7 +210,7 @@ Public Sub SetConfig(sAttrs As String)
     
 End Sub
 
-'修改或增加单个配置项，属性/值由"|"分隔
+'Modify or add a single configuration item, attribute/value separated by "|"
 Public Sub SetSingleConfig(sAttr As String)
     
     Dim sa() As String, s As String
@@ -222,9 +222,9 @@ Public Sub SetSingleConfig(sAttr As String)
         s = Replace(Replace(sa(1), "'", ""), " ", "")
         s = Replace(Replace(s, "[", "("), "]", ")")
         If Left$(s, 1) <> "(" And Right$(s, 1) <> ")" Then
-            If InStr(1, s, ",") Then '使用逗号分隔
+            If InStr(1, s, ",") Then 'Use commas
                 m_Base("panelwidths") = "(" & s & ")"
-            ElseIf InStr(1, s, " ") Then '使用空格分隔
+            ElseIf InStr(1, s, " ") Then 'Use spaces
                 s = Replace(Replace(s, "  ", " "), " ", ",")
                 m_Base("panelwidths") = "(" & s & ")"
             Else
@@ -239,8 +239,8 @@ Public Sub SetSingleConfig(sAttr As String)
     
 End Sub
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     Dim re As Collection, k As Variant, ks As Collection
     
@@ -278,13 +278,13 @@ Public Property Get Name() As String
     Name = m_Base.Name
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     m_Base.ctlType = sType
     m_Base.StyleName = sStyleName
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = m_CanbeOutByMainForm
 End Property
@@ -292,7 +292,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
     m_CanbeOutByMainForm = bEnable
 End Property
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
 End Function
@@ -309,19 +309,19 @@ Public Property Let ScaleMode(nV As Long)
     m_Base.ScaleMode = nV
 End Property
 
-'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
-'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
-'返回值含义：
-'<0：表示本对象需要在另一个对象前输出代码
-'=0：表示两者将没有依赖关系，代码前后顺序无影响
-'>0：另一个对象要先输出代码。
-'整体的逻辑结果类似是重的沉底
+'Function used to simulate compare sorting, actually to determine the dependency relationship between two objects
+'Compare this object with another object, logical result is 'this object - another object'
+'Return value meaning:
+'<0: indicates that this object needs to output code before another object
+'=0: indicates that there is no dependency relationship between the two, code order is not affected
+'>0: another object needs to output code first.
+'The overall logical result is similar to heavier items sinking to the bottom
 Public Function Compare(ByRef Obj As Object) As Long
-    If Parent = Obj.Name Then '父控件先输出代码
+    If Parent = Obj.Name Then 'Parent control outputs code first
         Compare = 1
     ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then 'Top-level controls output first
         Compare = -1
     ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1

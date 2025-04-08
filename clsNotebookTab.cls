@@ -13,9 +13,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'选项卡中的单页，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
+'Single page in the tab, used to set and maintain the corresponding properties and values, and generate the corresponding PYTHON TKinter code
 
-Private m_Comps() As Object  '保存此选项页中所有的控件
+Private m_Comps() As Object  'Save all controls in this tab page
 Private m_CanbeOutByMainForm As Boolean
 Private m_SubWidgets() As Object
 Private m_numSubWidgets As Long
@@ -23,16 +23,16 @@ Private m_Name As String
 Private m_Caption As String
 Private m_Parent  As String
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handling callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     Dim I As Long
     
-    '得先按依赖关系进行排序
+    'Sort by dependency relationship first
     SortWidgets m_SubWidgets, m_numSubWidgets
     
     For I = 0 To m_numSubWidgets - 1
@@ -40,8 +40,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     Next
 End Sub
 
-
-'创建对象后要马上调用这个函数初始化各参数
+'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
     m_Name = o.Properties("Name")
     
@@ -53,26 +52,26 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Op
     m_numSubWidgets = 0
 End Sub
 
-'增加一个子控件
+'Add a sub control
 Public Sub AddSubWidget(oWidget As Object)
     ReDim Preserve m_SubWidgets(m_numSubWidgets) As Object
     Set m_SubWidgets(m_numSubWidgets) = oWidget
     m_numSubWidgets = m_numSubWidgets + 1
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 0
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     hasAttribute = False
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     GetAttrCurrentValue = ""
 End Function
@@ -81,18 +80,18 @@ Public Function Tips(sAttr As String) As String
     Tips = ""
 End Function
 
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+'Update the configuration selected by the user to the object, the parameter is many attribute/value pairs separated by "|"
 Public Sub SetConfig(sAttrs As String)
     '''''
 End Sub
 
-'修改或增加单个配置项，属性/值由"|"分隔
+'Modify or add a single configuration item, attribute/value separated by "|"
 Public Sub SetSingleConfig(sAttr As String)
     ''''''
 End Sub
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     Set Allitems = New Collection
 End Function
@@ -119,12 +118,12 @@ Public Property Get Caption() As String
     Caption = m_Caption
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     ''''
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = m_CanbeOutByMainForm
 End Property
@@ -132,7 +131,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
     m_CanbeOutByMainForm = bEnable
 End Property
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     'vSer.Serializer m_Base
 End Function
@@ -149,19 +148,19 @@ Public Property Let ScaleMode(nV As Long)
     'm_Base.ScaleMode = nV
 End Property
 
-'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
-'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
-'返回值含义：
-'<0：表示本对象需要在另一个对象前输出代码
-'=0：表示两者将没有依赖关系，代码前后顺序无影响
-'>0：另一个对象要先输出代码。
-'整体的逻辑结果类似是重的沉底
+'Function used to simulate compare sorting, actually to determine the dependency relationship between two objects
+'Compare this object with another object, logical result is 'this object - another object'
+'Return value meaning:
+'<0: indicates that this object needs to output code before another object
+'=0: indicates that there is no dependency relationship between the two, code order is not affected
+'>0: another object needs to output code first.
+'The overall logical result is similar to heavier items sinking to the bottom
 Public Function Compare(ByRef Obj As Object) As Long
-    If Parent = Obj.Name Then '父控件先输出代码
+    If Parent = Obj.Name Then 'Parent control outputs code first
         Compare = 1
     ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then 'Top-level controls output first
         Compare = -1
     ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1
@@ -169,5 +168,3 @@ Public Function Compare(ByRef Obj As Object) As Long
         Compare = 0
     End If
 End Function
-
-

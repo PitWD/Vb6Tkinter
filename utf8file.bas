@@ -1,20 +1,20 @@
 Attribute VB_Name = "utf8file"
-' UTF8文件读写
+' UTF8 file read/write
 Option Explicit
 
-Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cbMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
+Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function MultiByteToWideChar Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long) As Long
 
-' UTF-8代码页常量
+' UTF-8 code page constant
 Private Const CP_UTF8 = 65001
 
-'返回一个字节数组的元素个数
+' Returns the number of elements in a byte array
 Private Function BytesLength(abBytes() As Byte) As Long
     On Error Resume Next
     BytesLength = UBound(abBytes) - LBound(abBytes) + 1
 End Function
 
-'转换字符串为UTF-8字节数组
+' Converts a string to a UTF-8 byte array
 Public Function Utf8BytesFromString(strInput As String) As Byte()
     Dim nBytes As Long
     Dim abBuffer() As Byte
@@ -29,7 +29,7 @@ Public Function Utf8BytesFromString(strInput As String) As Byte()
     Utf8BytesFromString = abBuffer
 End Function
 
-'转换UTF-8字节数组为字符串
+' Converts a UTF-8 byte array to a string
 Public Function Utf8BytesToString(abUtf8Array() As Byte) As String
     Dim nBytes As Long
     Dim nChars As Long
@@ -47,7 +47,7 @@ Public Function Utf8BytesToString(abUtf8Array() As Byte) As String
 End Function
 
 Public Function ReadFileIntoString(sFilePath As String) As String
-' Reads file (if it exists) into a string.
+    ' Reads file (if it exists) into a string.
     Dim strIn As String
     Dim hFile As Integer
     
@@ -64,8 +64,8 @@ Public Function ReadFileIntoString(sFilePath As String) As String
 End Function
 
 Public Function WriteFileFromString(sFilePath As String, strIn As String) As Boolean
-' Creates a file from a string. Clobbers any existing file.
-On Error GoTo OnError
+    ' Creates a file from a string. Clobbers any existing file.
+    On Error GoTo OnError
     Dim hFile As Integer
     
     If Len(Dir(sFilePath)) > 0 Then
@@ -84,7 +84,7 @@ OnError:
 End Function
 
 Public Function ReadFileIntoBytes(sFilePath As String) As Byte()
-' Reads file (if it exists) into an array of bytes.
+    ' Reads file (if it exists) into an array of bytes.
     Dim abData() As Byte
     Dim hFile As Integer
     
@@ -103,8 +103,8 @@ Public Function ReadFileIntoBytes(sFilePath As String) As Byte()
 End Function
 
 Public Function WriteFileFromBytes(sFilePath As String, abData() As Byte) As Boolean
-' Creates a file from a string. Clobbers any existing file.
-On Error GoTo OnError
+    ' Creates a file from a string. Clobbers any existing file.
+    On Error GoTo OnError
     Dim hFile As Integer
     
     If Len(Dir(sFilePath)) > 0 Then
@@ -122,15 +122,15 @@ OnError:
     
 End Function
 
-'外部接口
-'读取文件的二进制数据到一个字节数组中，返回读取的字节数，0表示失败
+' External interfaces
+' Reads the binary data of a file into a byte array, returns the number of bytes read, 0 indicates failure
 Public Function ReadFileBinaryContent(sFile As String, ByRef abContent() As Byte) As Long
     
     Dim fn As Long, nSize As Long
     
     On Error GoTo FileError
     
-    '获取二进制数据
+    ' Get binary data
     fn = FreeFile
     Open sFile For Binary As fn
     nSize = LOF(fn)
@@ -146,7 +146,7 @@ FileError:
     
 End Function
 
-'写UTF8文件
+' Writes UTF-8 file
 Public Sub Utf8File_Write_VB(ByVal sFileName As String, ByVal vVar As String)
     Dim b() As Byte
     
@@ -154,8 +154,8 @@ Public Sub Utf8File_Write_VB(ByVal sFileName As String, ByVal vVar As String)
     WriteFileFromBytes sFileName, b
 End Sub
 
-'下面是以前的实现，需要外部依赖
-'要添加引用Microsoft Activex data objects 2.8 library
+' Below is the previous implementation, requires external dependencies
+' Need to add reference to Microsoft Activex data objects 2.8 library
 'Public Sub Utf8File_Write_VB(ByVal sFileName As String, ByVal vVar As String)
 '    Dim adostream As New ADODB.Stream
 '    Dim fn As Long, abContent() As Byte, nSize As Long
@@ -171,7 +171,7 @@ End Sub
 '    End With
 '    Set adostream = Nothing
 '
-'    '去掉BOM
+'    ' Remove BOM
 '    On Error GoTo FileError
 '
 '    fn = FreeFile
@@ -189,7 +189,7 @@ End Sub
 '    Close fn
 'End Sub
 
-'要添加引用Microsoft Activex data objects 2.8 library
+' Need to add reference to Microsoft Activex data objects 2.8 library
 'Public Function Utf8File_Read_VB(ByVal sFileName As String) As String
 '    Dim adostream As New ADODB.Stream
 '    With adostream

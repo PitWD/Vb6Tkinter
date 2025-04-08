@@ -13,10 +13,10 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'菜单项类，表示每一个菜单项
+'Menu item class, representing each menu item
 
-Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
-Private m_Base As clsBaseControl                                                '基础控件类
+Private m_dicTotal As Dictionary        'Store all properties, including default values
+Private m_Base As clsBaseControl        'Base control class
 Private m_Visible As Boolean
 Private m_IsSeparator As Boolean
 Private m_IsCheckBox As Boolean
@@ -25,13 +25,13 @@ Private m_Childs() As Object
 Private m_numChilds As Long
 Private m_IdxCurChild As Long
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
-'index: 这个菜单项在其父菜单下的索引号，从0开始，用于i18n设置label
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handler callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
+'index: The index of this menu item under its parent menu, starting from 0, used for i18n setting label
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, index As Long)
     Dim I As Long, extra As String, var As String, sTmp As String, s() As String, sr2 As String, sr3 As String
     
@@ -39,19 +39,19 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     
     If m_numChilds > 0 Then
         sOut.Append vbCrLf & "        self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
-        For I = 0 To m_numChilds - 1                                            '递归生成代码
+        For I = 0 To m_numChilds - 1                                            'Recursively generate code
             m_Childs(I).toString sOut, sCmd, sI18n, rel, usettk, I
         Next
         
-        If m_Visible Then                                                       '如果Visible=0，一般说明此菜单设置为右键弹出菜单
+        If m_Visible Then                                                       'If Visible=0, it generally means this menu is set as a right-click popup menu
             m_Base("variable") = ""
             m_Base("command") = ""
             extra = GetExtraParams()
             sOut.Append "        self." & m_Base.Parent & ".add_cascade(menu=" & "self." & m_Base.Name & IIf(Len(extra), ", " & extra, "") & ")"
         End If
-    ElseIf m_IsSeparator Then                                                   '菜单分隔符
+    ElseIf m_IsSeparator Then                                                   'Menu separator
         sOut.Append "        self." & m_Base.Parent & ".add_separator()"
-    ElseIf m_IsCheckBox Then                                                    ' 菜单增加选择框
+    ElseIf m_IsCheckBox Then                                                    ' Menu add checkbox
         If m_Base("variable") <> "" Then
             sOut.Append "        self." & m_Base("variable") & " = StringVar()"
             sOut.Append "        self." & m_Base("variable") & ".set(1)"
@@ -75,14 +75,14 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         End If
     End If
     
-    '国际化翻译
+    'Internationalization translation
     If (Not m_IsSeparator) And Len(m_Base("label")) > 0 Then
         sI18n.Append "        self." & m_Base.Parent & ".entryconfigure(" & index & ", label=_(" & U(m_Base("label")) & "))"
     End If
     
-    '有需要使用bind语句绑定的其他事件处理
+    'If there are other event handlers that need to be bound using the bind statement
     If m_numChilds = 0 And Not m_IsSeparator And Len(m_Base("bindcommand")) Then
-        sTmp = UnQuote(m_Base("bindcommand")) '自动去掉括号，如果有的话
+        sTmp = UnQuote(m_Base("bindcommand")) 'Automatically remove brackets, if any
         
         s = Split(sTmp, ",")
         For I = 0 To UBound(s)
@@ -93,7 +93,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
                 sr2 = Mid$(s(I), Len(s(I)) - 1, 1)
                 sr3 = Mid$(s(I), Len(s(I)) - 2, 1)
                 
-                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+                'Python is case-sensitive, and so are the corresponding shortcuts. If the shortcut key contains a letter key, bind the corresponding uppercase/lowercase as well
                 If sr3 = "-" Then
                     If sr2 >= "a" And sr2 <= "z" Then
                         s(I) = Left$(s(I), Len(s(I)) - 2) & UCase$(sr2) & ">"
@@ -108,7 +108,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     End If
 End Sub
 
-'创建对象后要马上调用这个函数初始化各参数
+'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parentHeight As Long, Optional dMethods As Dictionary)
     
     Dim s As String
@@ -121,7 +121,7 @@ Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parent
     m_IsSeparator = (o.Properties("Caption") = "-")
     m_IsCheckBox = (o.Properties("Checked") = True)
     
-    '这些是所有的默认值
+    'These are all the default values
     m_dicTotal("label") = Replace(o.Properties("Caption"), "&", "")
     m_dicTotal("fg") = ""
     m_dicTotal("bg") = ""
@@ -144,7 +144,7 @@ Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parent
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
     
-    If m_dicTotal("accelerator") <> "" Then                                     '快捷键绑定
+    If m_dicTotal("accelerator") <> "" Then                                     'Shortcut key binding
         s = m_dicTotal("accelerator")
         m_Base("accelerator") = s
         s = "'<" & Replace(s, "Ctrl", "Control") & ">'"
@@ -153,7 +153,7 @@ Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parent
     
 End Sub
 
-'将VB快捷键的枚举值转换为一个可读的字符串
+'Convert VB shortcut enumeration value to a readable string
 Private Function TransShortcut(nsc As Long) As String
     Select Case nsc
     Case 0
@@ -184,8 +184,7 @@ Private Function TransShortcut(nsc As Long) As String
     
 End Function
 
-
-'除了必选参数外，这个函数生成用户选择的其他参数列表
+'Generate a list of other parameters chosen by the user in addition to the mandatory parameters
 Public Function GetExtraParams() As String
     Dim cfg As Variant, k As Variant, ks As Variant, sValue As String
     
@@ -193,7 +192,7 @@ Public Function GetExtraParams() As String
     
     For Each k In ks
         If isExtra(k) And Len(m_Base(k)) Then
-            '需要使用引号括起来的属性，如果用户忘了，则在这里自动添加
+            'Attributes that need to be enclosed in quotes, if the user forgets, add them here automatically
             If k = "label" Then
                 sValue = U(m_Base(k))
             ElseIf InStr(1, " fg, bg, state, accelerator, ", " " & k & ",") Then
@@ -220,9 +219,9 @@ Private Function isExtra(ByVal sK As String) As Boolean
     isExtra = (InStr(1, " tearoff, variable, command, postcommand, bindcommand, font, ", Space(1) & sK & ",") <= 0)
 End Function
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     If sAttr = "tearoff" Then
         GetAttrValueList = 1
@@ -235,12 +234,12 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     hasAttribute = m_Base.hasAttribute(sAttr)
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
@@ -252,7 +251,7 @@ Public Function Tips(sAttr As String) As String
     ElseIf sAttr = "postcommand" Then
         Tips = sAttr & vbCrLf & L("l_TipPostCmdMenu", "A procedure will be called every time someone brings up this menu.")
     ElseIf sAttr = "accelerator" Then
-        Tips = sAttr & vbCrLf & L("l_TipAcceleratorMenu", "To display an keystroke combination on the right side of a menu choice.")
+        Tips = sAttr & vbCrLf & L("l_TipAcceleratorMenu", "To display a keystroke combination on the right side of a menu choice.")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
@@ -272,14 +271,14 @@ Private Sub Class_Initialize()
     
 End Sub
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     Dim re As Collection, k As Variant, ks As Collection
     
     Set re = New Collection
     
-    '标准参数
+    'Standard parameters
     Set ks = m_dicTotal.Keys
     For Each k In ks
         If Len(m_Base(k)) Then
@@ -289,7 +288,7 @@ Public Function Allitems() As Collection
         End If
     Next
     
-    '用户增加的自定义参数（如果有的话）
+    'User-added custom parameters (if any)
     Set ks = m_Base.Keys
     For Each k In ks
         If Not m_dicTotal.Exists(k) Then
@@ -330,13 +329,13 @@ Public Property Let Name(s As String)
     m_Base.Name = s
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     'm_Base.ctlType = sType
     'm_Base.StyleName = sStyleName
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = False
 End Property
@@ -344,7 +343,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
     'm_CanbeOutByMainForm = bEnable
 End Property
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
 End Function

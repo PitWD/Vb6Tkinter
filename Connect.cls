@@ -22,7 +22,7 @@ Attribute MenuHandler.VB_VarHelpID = -1
 Public WithEvents ToolBoxHandler As CommandBarEvents
 Attribute ToolBoxHandler.VB_VarHelpID = -1
 
-'ADDIN必须要实现的接口，使用这个接口而不是直接使用VB6提供的Designer是为了支持VB6绿色精简版
+'The interface that the ADDIN must implement. Using this interface instead of directly using the Designer provided by VB6 is to support the green, streamlined version of VB6.
 Implements IDTExtensibility
 
 Private Sub Class_Terminate()
@@ -30,19 +30,19 @@ Private Sub Class_Terminate()
 End Sub
 
 Private Sub IDTExtensibility_OnAddInsUpdate(custom() As Variant)
-    '预防编译器删除函数，因为这个接口必须要实现
+    'Prevent the compiler from deleting the function because this interface must be implemented.
     Dim i As Long
     i = 1
 End Sub
 Private Sub IDTExtensibility_OnStartupComplete(custom() As Variant)
-    '预防编译器删除函数，因为这个接口必须要实现
+    'Prevent the compiler from deleting the function because this interface must be implemented.
     Dim i As Long
     i = 1
 End Sub
 
 Private Sub IDTExtensibility_OnConnection(ByVal VBInst As Object, ByVal ConnectMode As VBIDE.vbext_ConnectMode, ByVal AddInInst As VBIDE.AddIn, custom() As Variant)
     Set VbeInst = VBInst
-    
+
     If ConnectMode = vbext_cm_Startup Or ConnectMode = vbext_cm_AfterStartup Then
         AddToMenu (App.Title & "(&T)")
         AddToToolBox (App.Title)
@@ -58,7 +58,7 @@ Private Sub IDTExtensibility_OnDisconnection(ByVal RemoveMode As VBIDE.vbext_Dis
     
     On Error Resume Next
     
-    '删除命令栏条目
+    'Delete command bar entries.
     If Not (mcbMenuItem Is Nothing) Then mcbMenuItem.Delete
     If Not (mcbToolBoxItem Is Nothing) Then mcbToolBoxItem.Delete
     Set mcbMenuItem = Nothing
@@ -81,25 +81,25 @@ Public Sub Show()
     mfrmAddIn.Show
 End Sub
 
-'在外接程序菜单下增加一个菜单项
+'Add a menu item under the Add-Ins menu.
 Private Sub AddToMenu(sCaption As String)
     Dim cbMenuCommandBar As Office.CommandBarControl
     Dim cbMenu As Variant
     
     On Error Resume Next
     
-    '察看能否找到外接程序菜单
-    Set cbMenu = VbeInst.CommandBars("外接程序")
+    'See if the Add-Ins menu can be found.
+    Set cbMenu = VbeInst.CommandBars("澶栨帴绋嬪簭")
     If cbMenu Is Nothing Then Set cbMenu = VbeInst.CommandBars("Add-Ins")
     If cbMenu Is Nothing Then Exit Sub
 
-    '添加它到命令栏
+    'Add a command button.
     Set cbMenuCommandBar = cbMenu.Controls.Add(msoControlButton)
     If cbMenuCommandBar Is Nothing Then Exit Sub
     
     cbMenuCommandBar.BeginGroup = True
     
-    '设置标题
+    'Set the caption.
     cbMenuCommandBar.Caption = sCaption
     
     'DoEvents
@@ -111,14 +111,14 @@ Private Sub AddToMenu(sCaption As String)
     Set MenuHandler = VbeInst.Events.CommandBarEvents(mcbMenuItem)
 End Sub
 
-'在工具栏增加一个图标
+'Add an icon to the toolbar.
 Private Sub AddToToolBox(sCaption As String)
     Dim cbToolboxCommandBar As Office.CommandBarControl
     Dim cbStandard As CommandBar
     
-    '察看能否找到标准工具栏
+    'See if the standard toolbar can be found.
     On Error Resume Next
-    Set cbStandard = VbeInst.CommandBars("标准")
+    Set cbStandard = VbeInst.CommandBars("鏍囧噯")
     If cbStandard Is Nothing Then Set cbStandard = VbeInst.CommandBars("Standard")
     If cbStandard Is Nothing Then Set cbStandard = VbeInst.CommandBars(2)
     If cbStandard Is Nothing Then Exit Sub
@@ -127,7 +127,7 @@ Private Sub AddToToolBox(sCaption As String)
     'On Error GoTo AddToAddInToolboxErr
     On Error Resume Next
     
-    '添加它到工具栏
+    'Add a command button.
     Set cbToolboxCommandBar = cbStandard.Controls.Add(msoControlButton, , , cbStandard.Controls.Count)
     cbToolboxCommandBar.BeginGroup = True
     cbToolboxCommandBar.Caption = sCaption

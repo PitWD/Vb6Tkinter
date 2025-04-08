@@ -21,7 +21,7 @@ Begin VB.Form frmEncodeAFile
    MinButton       =   0   'False
    ScaleHeight     =   9645
    ScaleWidth      =   13230
-   StartUpPosition =   1  '所有者中心
+   StartUpPosition =   1  'Center Owner
    Begin VB.TextBox txtCharsPerLine 
       Height          =   375
       Left            =   2280
@@ -149,7 +149,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-'实际编码一个文件
+'Encode a file to Base64
 Private Sub cmdBase64It_Click()
     Dim sFileName As String, sResult As String, abContent() As Byte, charsPerLine As Integer
     Dim sF As String
@@ -172,7 +172,7 @@ Private Sub cmdBase64It_Click()
         Exit Sub
     End If
     
-    '用二进制方式读取内容
+    'Read content in binary mode
     If ReadFileBinaryContent(sFileName, abContent) = 0 Then
         MsgBox L_F("l_msgReadFileError", "Error in Reading File {0}.", sFileName), vbInformation
         Exit Sub
@@ -202,7 +202,7 @@ Private Sub cmdCancelEncode_Click()
     Unload Me
 End Sub
 
-'打开文件浏览框，选择一个文件进行编码
+'Open file dialog to choose a file to encode
 Private Sub cmdChooseSourceToEncode_Click()
     Dim sF As String
     sF = FileDialog(Me, False, L("l_fdOpen", "Please Choose file:"), "All Files (*.*)|*.*", txtSourceToEncode.Text)
@@ -211,7 +211,7 @@ Private Sub cmdChooseSourceToEncode_Click()
     End If
 End Sub
 
-'将文本框的内容保存到磁盘文本文件
+'Save the content of the text box to a disk file
 Private Sub cmdSaveBase64Result_Click()
     Dim sF As String, s As String, nm As Long, nf As Long
     
@@ -219,7 +219,7 @@ Private Sub cmdSaveBase64Result_Click()
     If Len(s) > 2 Then
         sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*")
         If Len(sF) Then
-            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
+            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  'If the filename has no extension, automatically add .py extension
             SaveStringToFile sF, s
         End If
     End If
@@ -228,7 +228,7 @@ End Sub
 Private Sub Form_Load()
     Dim ctl As Control
     
-    '多语种支持
+    'Multi-language support
     Me.Caption = L(Me.Name, Me.Caption)
     For Each ctl In Me.Controls
         If TypeName(ctl) = "xpcmdbutton" Or TypeName(ctl) = "Label" Then
@@ -250,7 +250,7 @@ errHandler:
     MsgBox L_F("l_msgWriteFileError", "Error in Writing File {0}.", sFileName), vbInformation
 End Sub
 
-'添加Ctrl+A快捷键
+'Add Ctrl+A shortcut
 Private Sub txtBase64Result_KeyDown(KeyCode As Integer, Shift As Integer)
     If KeyCode = vbKeyA And Shift = vbCtrlMask Then
         txtBase64Result.SelStart = 0

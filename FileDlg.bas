@@ -1,9 +1,9 @@
 Attribute VB_Name = "FileDlg"
-'使用API实现的文件打开保存对话框
-'使用方法
-'Text1 = FileDialog(Me, False, "请选择文件", "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*")
-'Text2 = FileDialog(Me, True, "保存文件到", "*.exe", FileName & "360safebox")
-'Text3 = GetFolderName(me.hWnd, "请选择目录")
+'Implemented using API file open and save dialog
+'Usage
+'Text1 = FileDialog(Me, False, "Please select a file", "Text file (*.txt)|*.txt|All files (*.*)|*.*")
+'Text2 = FileDialog(Me, True, "Save file to", "*.exe", FileName & "360safebox")
+'Text3 = GetFolderName(me.hWnd, "Please select a directory")
 
 Option Explicit
 Public Type OPENFILENAME
@@ -103,12 +103,11 @@ Public Declare Function GetModuleFileName Lib "kernel32" Alias "GetModuleFileNam
 Public Declare Function GetShortPathName Lib "kernel32" Alias "GetShortPathNameA" (ByVal lpszLongPath As String, ByVal lpszShortPath As String, ByVal cchBuffer As Long) As Long
 Public Declare Function GetTickCount Lib "kernel32" () As Long
 
-Private Const BIF_RETURNONLYFSDIRS = &H1                                        '浏览文件夹
-Private Const BIF_NEWDIALOGSTYLE = &H40                                         '新样式（有新建文件夹按钮，可调整对话框大小）
-Private Const BIF_NONEWFOLDERBUTTON = &H200                                     '新样式中，没有新建按钮（只调大小）
+Private Const BIF_RETURNONLYFSDIRS = &H1                                        'Browse for folders
+Private Const BIF_NEWDIALOGSTYLE = &H40                                         'New style (with new folder button, resizable dialog)
+Private Const BIF_NONEWFOLDERBUTTON = &H200                                     'New style, no new folder button (resizable only)
 
-
-Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional ByVal InitDir As String, Optional bModal As Boolean = True) As String
+Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional bModal As Boolean, Optional ByVal InitDir As String) As String
     Dim OFN   As OPENFILENAME
     Dim r     As Long
     
@@ -304,7 +303,7 @@ Public Function CreatePath(ByVal Path As String) As Boolean
         Exit Function
     End If
 Fail:
-    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + Path + Chr$(34), vbExclamation, App.Title + " - CreatePath Function")
+    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + Path + Chr$(34), vbExclamation + vbOKOnly + vbApplicationModal, App.Title)
     
 End Function
 
@@ -315,9 +314,9 @@ Public Function GetFolderName(hWnd As Long, Text As String) As String
     Dim Path As String
     With bi
         .hwndOwner = hWnd
-        .pidlRoot = 0&                                                          '根目录，一般不需要改
+        .pidlRoot = 0&                                                          'Root directory, generally does not need to be changed
         .lpszTitle = lstrcat(Text, "")
-        .ulFlags = BIF_RETURNONLYFSDIRS                                         '根据需要调整
+        .ulFlags = BIF_RETURNONLYFSDIRS                                         'Adjust as needed
     End With
     pidl = SHBrowseForFolder(bi)
     Path = Space$(512)
@@ -326,29 +325,29 @@ Public Function GetFolderName(hWnd As Long, Text As String) As String
     End If
 End Function
 
-'查找指定目录下的所有文件，不支持子文件夹递归
-'调用示例
-'  SearchFiles "C:\Program Files\WinRAR\", "*" '查找所有文件
-'  SearchFiles "C:\Program Files\WinRAR\", "*.exe" '查找所有exe文件
-'  SearchFiles "C:\Program Files\WinRAR\", "*in*.exe" '查找文件名中包含有 in 的exe文件
+'Search for all files in the specified directory, does not support subfolder recursion
+'Usage example
+'  SearchFiles "C:\Program Files\WinRAR\", "*" 'Search for all files
+'  SearchFiles "C:\Program Files\WinRAR\", "*.exe" 'Search for all exe files
+'  SearchFiles "C:\Program Files\WinRAR\", "*in*.exe" 'Search for exe files that contain 'in' in the filename
 Public Function SearchFiles(Path As String, FileType As String, Optional ForceSuffixMatch As Boolean = False) As String()
     Dim sPath As String, numFiles As Long, suffix As String, nLensuffix As Long
     Dim saFiles() As String
     
     If Right$(Path, 1) <> "\" Then Path = Path & "\"
     
-    '强迫使用后缀匹配
+    'Force suffix match
     If ForceSuffixMatch Then
         nLensuffix = Len(FileType) - InStrRev(FileType, ".")
         suffix = Right$(FileType, nLensuffix)
     End If
     
     On Error GoTo SFErr
-    sPath = Dir(Path & FileType) '查找第一个文件
+    sPath = Dir(Path & FileType) 'Find the first file
     
     numFiles = 0
-    Do While Len(sPath) '循环到没有文件为止
-        If ForceSuffixMatch Then  '强迫后缀名适配，而不仅仅是中间的一部分
+    Do While Len(sPath) 'Loop until no files are found
+        If ForceSuffixMatch Then  'Force suffix match, not just a part in the middle
             If Right$(sPath, nLensuffix) = suffix Then
                 ReDim Preserve saFiles(numFiles) As String
                 saFiles(numFiles) = Path & sPath
@@ -359,8 +358,8 @@ Public Function SearchFiles(Path As String, FileType As String, Optional ForceSu
             saFiles(numFiles) = Path & sPath
             numFiles = numFiles + 1
         End If
-        sPath = Dir '查找下一个文件
-        'DoEvents '让出控制权
+        sPath = Dir 'Find the next file
+        'DoEvents 'Yield control
     Loop
     
     If numFiles Then

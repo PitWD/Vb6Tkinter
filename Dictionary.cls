@@ -15,7 +15,7 @@ Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'对SCRIPTING.DICTIONARY的简单封装
+' Simple encapsulation of SCRIPTING.DICTIONARY
 
 Private m_dic As Object
 
@@ -67,7 +67,7 @@ Public Property Get Count() As Long
     Count = m_dic.Count
 End Property
 
-'对象序列化函数
+' Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     
     Dim k As Variant

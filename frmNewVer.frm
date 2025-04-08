@@ -22,7 +22,7 @@ Begin VB.Form frmNewVer
       _ExtentY        =   1085
       Caption         =   "Cancel"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   9
          Charset         =   134
          Weight          =   400
@@ -41,7 +41,7 @@ Begin VB.Form frmNewVer
       _ExtentY        =   1085
       Caption         =   "Download"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   9
          Charset         =   134
          Weight          =   400
@@ -52,7 +52,7 @@ Begin VB.Form frmNewVer
    End
    Begin VB.Label lblInfo 
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Arial"
          Size            =   15.75
          Charset         =   134
          Weight          =   700
@@ -85,7 +85,7 @@ End Sub
 Private Sub Form_Load()
     Dim ctl As Control
     
-    '多语种支持
+    'Multi-language support
     Me.Caption = L(Me.Name, Me.Caption)
     For Each ctl In Me.Controls
         If TypeName(ctl) = "xpcmdbutton" Then

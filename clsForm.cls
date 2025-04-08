@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'窗体类的抽象，保存VB窗体属性
+'Abstract of form class, storing VB form properties
 Private m_Base As clsBaseControl
 Private m_Name As String
 Private m_Title As String
@@ -28,28 +28,28 @@ Private m_IconFile As String
 Private m_IconEmbedding As Boolean
 Private m_Protocol As String
 Private m_Bindcommand As String
-Private m_FrmPath As String          '保存窗体所在目录
+Private m_FrmPath As String          'Store the directory where the form is located
 Private m_ScaleMode As Long
-Private m_IconFilesInPath As String '在窗体所在目录下所有的图标文件，使用逗号分隔
+Private m_IconFilesInPath As String 'All icon files in the form's directory, separated by commas
 Private m_StartupPosition As String
 
-Const defaultIconName As String = "icon.gif" '如果存在此文件名，则自动做为窗体图标
+Const defaultIconName As String = "icon.gif" 'If this file name exists, it is automatically used as the form icon
 
-'输出PYTHON代码,
-'sOut: 输出参数，界面代码
-'sCmd: 输出参数，事件处理回调代码
-'sI18n: 输出参数，控件文本翻译代码
-'rel:是否使用相对坐标,
-'usettk:是否使用TTK主题扩展
+'Output PYTHON code,
+'sOut: Output parameter, interface code
+'sCmd: Output parameter, event handler callback code
+'sI18n: Output parameter, control text translation code
+'rel: Whether to use relative coordinates,
+'usettk: Whether to use TTK theme extension
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
-     '如果需要窗体在屏幕中间，计算相对位置，这句话要放在最前面，避免窗口启动后先有一个小框再移动到屏幕正中
+     'If the form needs to be centered on the screen, calculate the relative position, this statement should be placed at the front to avoid a small box then moving to the center
     If m_StartupPosition = "Center" Then
         CenterWindow sOut
     End If
     
     sOut.Append "        self.master.title(" & U(m_Title) & ")"
     sI18n.Append "        self.master.title(_(" & U(m_Title) & "))"
-    If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
+    If m_StartupPosition = "Manual" Then  'Manually specify the initial position of the window
         sOut.Append "        self.master.geometry('" & m_Geometry & CoordinateOnStart() & "')"
     ElseIf m_StartupPosition <> "Center" Then
         sOut.Append "        self.master.geometry('" & m_Geometry & "')"
@@ -59,8 +59,8 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
     End If
     If m_Topmost Then
-        '增加wait函数是因为http://code.activestate.com/lists/python-list/385778/，有网友反馈偶尔会出现窗体不显示的情况，
-        'wait函数可以规避这个问题
+        'Adding wait function because of http://code.activestate.com/lists/python-list/385778/, some users reported that the form occasionally does not display,
+        'the wait function can avoid this problem
         sOut.Append "        self.master.wait_visibility(self.master)"
         sOut.Append "        self.master.wm_attributes('-topmost', 1)"
     End If
@@ -68,12 +68,12 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self.master.wm_attributes('-alpha', " & m_Alpha & ")"
     End If
     
-    ProcessIcon sOut  '处理窗体图标
-    ProcessBindCommand sOut, sCmd ' 处理bindcommand
-    ProcessProtocol sOut, sCmd '窗口消息拦截，如果有的话
+    ProcessIcon sOut  'Process form icon
+    ProcessBindCommand sOut, sCmd ' Process bindcommand
+    ProcessProtocol sOut, sCmd 'Window message interception, if any
 End Sub
 
-'处理窗体图标
+'Process form icon
 Private Sub ProcessIcon(sOut As cStrBuilder)
     
     Dim s As String, sBase64 As String
@@ -82,15 +82,15 @@ Private Sub ProcessIcon(sOut As cStrBuilder)
     
     s = UCase(FileExt(m_IconFile))
     
-    '处理窗体图标
+    'Process form icon
     If s = "GIF" And m_IconEmbedding Then
-        sBase64 = CreateIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
+        sBase64 = CreateIconBase64(Space(12)) 'Embed GIF image in source code using BASE64
         If Len(sBase64) Then
             sOut.Append "        self.icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
             sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
             sOut.Append "        self.master.iconphoto(True, self.iconimg)"
         End If
-    ElseIf Len(s) = 0 Or s = "ICO" Then '如果没有后缀名，则假定为ico格式
+    ElseIf Len(s) = 0 Or s = "ICO" Then 'If there is no extension, assume it is ico format
         sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
     Else
         sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
@@ -98,7 +98,7 @@ Private Sub ProcessIcon(sOut As cStrBuilder)
     End If
 End Sub
 
-' 处理bindcommand
+' Process bindcommand
 Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmd As cStrBuilder)
     
     Dim I As Long, s() As String, sCmdName As String
@@ -116,12 +116,12 @@ Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmd As cStrBuilder)
             sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             sCmd.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
             
-            'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+            'Python is case sensitive, and so are the corresponding shortcut keys, if the shortcut key contains a letter key, bind the corresponding uppercase/lowercase as well
             If Right$(s(I), 3) >= "-a>" And Right$(s(I), 3) <= "-z>" Then
-                s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变大写
+                s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" 'Change to uppercase
                 sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             ElseIf Right$(s(I), 3) >= "-A>" And Right$(s(I), 3) <= "-Z>" Then
-                s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变小写
+                s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" 'Change to lowercase
                 sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             End If
         End If
@@ -129,7 +129,7 @@ Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmd As cStrBuilder)
     
 End Sub
 
-'窗口消息拦截，如果有的话
+'Window message interception, if any
 Private Sub ProcessProtocol(sOut As cStrBuilder, sCmd As cStrBuilder)
     
     Dim sa() As String, I As Long, s As String
@@ -149,8 +149,8 @@ Private Sub ProcessProtocol(sOut As cStrBuilder, sCmd As cStrBuilder)
     Next
 End Sub
 
-'将主窗体放置在屏幕中间
-'其实这几个语句可以使用一条语句来代替: self.master.eval('tk::PlaceWindow . center')
+'Place the main form in the center of the screen
+'In fact, these statements can be replaced with one statement: self.master.eval('tk::PlaceWindow . center')
 Private Sub CenterWindow(sOut As cStrBuilder)
     Dim W As String, H As String
     
@@ -188,14 +188,14 @@ DirErr:
 End Function
 
 
-'创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
+'Call this function immediately after creating the object to initialize the parameters, the form size is in pixels
 Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
     
     Dim s As String, cAttr As String, cValue As String, sa() As String, I As Long, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
-    '获取窗体所在目录
+    'Get the directory where the form is located
     On Error Resume Next
     s = o.FileNames(1)
     If Err.Number = 0 And Len(s) Then
@@ -222,7 +222,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     Else
         m_IconFile = ""
         
-        '如果有一个命名为 icon.gif 的图像文件，则自动选择此文件
+        'If there is an image file named icon.gif, automatically select this file
         sa = Split(m_IconFilesInPath, ",")
         For I = 0 To UBound(sa)
             s = sa(I)
@@ -244,8 +244,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     End If
     
     
-    '使用控件的tag属性保存一些额外默认要保存的属性，
-    '开始字符为：p@，后接（属性=值）对，每个属性使用@隔开，对于窗体来说，属性值必选
+    'Use the control's tag property to save some additional default properties,
+    'Start character: p@, followed by (property=value) pairs, each property is separated by @, property values are mandatory for forms
     s = Trim(o.Properties("Tag"))
     If Len(s) Then
         sa = Split(s, "@")
@@ -253,7 +253,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
             For I = 1 To UBound(sa)
                 s = sa(I)
                 idx = InStr(2, s, "=")
-                If idx > 0 Then '有值
+                If idx > 0 Then 'Has value
                     cAttr = Left$(s, idx - 1)
                     cValue = Mid$(s, idx + 1)
                     Select Case cAttr
@@ -277,9 +277,9 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     
 End Sub
 
-'设置属性值的可能值列表
-'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
-'输出：sa()可选值列表数组
+'Set the list of possible values for the attribute
+'Return value: 0 - no optional values, 1 - a strictly limited list of optional values, 2 - in addition to the provided list of optional values, other values can be manually entered
+'Output: sa() array of optional values
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 1
     If sAttr = "resizable" Or sAttr = "iconembedding" Or sAttr = "topmost" Then
@@ -302,12 +302,12 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
-'判断此控件是否存在对应的属性
+'Check if this control has the specified attribute
 Public Function hasAttribute(sAttr As String) As Boolean
     hasAttribute = m_Base.hasAttribute(sAttr)
 End Function
 
-'获取此控件对应的当前设定的属性值，没有则返回空串
+'Get the current value of the specified attribute for this control, return an empty string if not set
 Public Function GetAttrCurrentValue(sAttr As String) As String
     GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
@@ -334,7 +334,7 @@ Public Function Tips(sAttr As String) As String
         Case "icon"
             Tips = Tips & L("l_TipFrmIcon", "Icon file of Form, supports ico,gif,ppm,pgm.")
         Case "iconembedding"
-            Tips = Tips & L("l_TipFrmIconEmbedding", "Is icon embedding in source code or not, suports gif only.")
+            Tips = Tips & L("l_TipFrmIconEmbedding", "Is icon embedding in source code or not, supports gif only.")
         Case "bindcommand"
             Tips = Tips & L("l_TipBindCommand", "Used to attach events binding to a widget. for example:<Control-C>,<F8>,<Alt-A>.")
         Case "protocol"
@@ -346,7 +346,7 @@ Public Function Tips(sAttr As String) As String
     End Select
 End Function
 
-'将窗体目录下的所有图标文件存入m_IconFilesInPath，以备后续选择
+'Store all icon files in the form directory into m_IconFilesInPath for later selection
 Private Function AutoDetectIconFile() As String
     Dim sOut As New cStrBuilder, s As String
     m_IconFilesInPath = ""
@@ -363,14 +363,14 @@ Private Function AutoDetectIconFile() As String
     End If
 End Function
 
-'计算和生成窗体启动坐标
+'Calculate the coordinates when starting
 Private Function CoordinateOnStart() As String
     CoordinateOnStart = IIf(m_left >= 0, "+" & CStr(m_left), CStr(m_left))
     CoordinateOnStart = CoordinateOnStart & IIf(m_Top >= 0, "+" & CStr(m_Top), CStr(m_Top))
 End Function
 
-'返回一个集合，每个项目三元对"属性名|值|是否默认选择"
-'这个函数用于主界面填充属性参数列表框
+'Return a collection, each item is a triplet "property name|value|default selection"
+'This function is used to populate the property parameter list box on the main interface
 Public Function Allitems() As Collection
     Dim re As Collection
     
@@ -471,13 +471,13 @@ Public Property Let Name(s As String)
     m_Name = s
 End Property
 
-'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+'Used to change its default corresponding widget type, note the legality of the attribute list after modifying the widget type
 Public Function SetWidgetType(sType As String, sStyleName As String)
     'm_Base.ctlType = sType
     'm_Base.StyleName = sStyleName
 End Function
 
-'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+'Determine whether the main processing function can call its toString() to generate code, default is True, setting to False indicates that it is handled by other objects
 Public Property Get EnableOutByMainForm() As Boolean
     EnableOutByMainForm = True
 End Property
@@ -501,7 +501,7 @@ Private Sub Class_Terminate()
     Set m_Base = Nothing
 End Sub
 
-'对象序列化函数
+'Object serialization function
 Public Function Serializer(vSer As clsSerialization)
     'vSer.Serializer m_Base
 End Function

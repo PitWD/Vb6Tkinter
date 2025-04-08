@@ -1,6 +1,8 @@
-如果打开工程Vb6Tkinter.vbp失败，提示对象库未注册，一般是Windows Common Controls 6.0 (mscomctl.ocx)未成功加载。
-可以先尝试注册 'regsvr32 mscomctl.ocx'，如果还不成功，则可以 'regtlib msdatsrc.tlb'。
-至于 mscomctl.ocx/msdatsrc.tlb 在哪个目录，不同版本位置不同，搜索一下即可。
+If opening the project Vb6Tkinter.vbp fails with a prompt saying "Object library not registered," it is usually because the Windows Common Controls 6.0 (mscomctl.ocx) has not been successfully loaded.
+You can first try registering it with regsvr32 mscomctl.ocx.
+If that still doesn't work, you can try regtlib msdatsrc.tlb.
+
+As for the location of mscomctl.ocx or msdatsrc.tlb, it varies depending on the version. You can search for it to locate the files.
 
 32bit:
 cd c:\windows\system32
@@ -9,3 +11,7 @@ regtlib msdatsrc.tlb
 64bit:
 cd C:\Windows\SysWOW64\
 regtlib msdatsrc.tlb
+
+Translate Chinese remarks to English.
+Keep the whole text without line numbers.
+Delete the Chinese remarks after translation.
