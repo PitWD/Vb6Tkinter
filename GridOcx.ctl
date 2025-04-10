@@ -340,8 +340,12 @@ End Enum
 
 'Enum
 Public Enum SelectModeEnum
+    'PitWD April.10.2025
+    'Names were Chinese
+    '   translations were
+    '       "Single" instead of "Solo"
     None = 0
-    Single = 1
+    Solo = 1
     Multiple = 2
 End Enum
 
@@ -1518,7 +1522,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                             ' By default, it is the same size as the client area of the window, but it can be customized using SetRect.
                             ' Specifies the new dimensions of the formatted rectangle.
                             ' The SetRect function is used to set a formatted rectangle for a multi-line edit control. This formatted rectangle defines the text boundary and is independent of the edit control window's size.
-                            ' Parameters: 
+                            ' Parameters:
                             '   lpRect - A CRect or a pointer to a RECT structure. It specifies the new boundaries of the formatted rectangle.
                             '   Top-left coordinates: X1, Y1; Bottom-right coordinates: X2, Y2. This means drawing | first, then _, resulting in |_.                            SetRect r, 0, lY + 1, mCols(0).lWidth, lY + (mItems(mRowPtr(lRow)).lHeight) + 1
                         Else
@@ -1554,7 +1558,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                     '
                     If mCols(mColPtr(lCol)).bVisible Then
                         ' [API Function - SetRectRgn] SelectClipRgn
-                        ' Function: Sets a region to the rectangle described by X1, Y1, X2, and Y2. It modifies an existing region rather than creating a new one. 
+                        ' Function: Sets a region to the rectangle described by X1, Y1, X2, and Y2. It modifies an existing region rather than creating a new one.
                         '           The bottom and right edges of the rectangle are not included in the region.
                         ' Parameters:
                         '   hRgn Long - The region to be set to the specified rectangle.
@@ -1625,7 +1629,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                                     
                                     ' Standard function - Draw:
                                     ' Function: After performing a graphical operation on an image, this function draws the image onto a target device context, such as a PictureBox control.
-                                    ' Parameters: 
+                                    ' Parameters:
                                     '   object - Required. An object expression, which can be a ListImage object or a ListImages collection.
                                     '   hDC - Required. The value of the hDC property set for the target object.
                                     '   x, y - Optional. Specifies the coordinates within the device context where the image will be drawn. If not specified, the image will be drawn at the origin of the device context.
@@ -1662,7 +1666,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                             '    Function Purpose:
                             '    Parameters:
                             '    Return Value:
-                            '    Remarks:                            
+                            '    Remarks:
                             If Not DrawTheme("Button", 3, lValue, r) Then
                                 If mItems(mRowPtr(lRow)).Cell(mColPtr(lCol)).nFlags And lgFLChecked Then
                                     Call DrawFrameControl(.hdc, r, DFC_BUTTON, DFCS_BUTTONCHECK Or DFCS_CHECKED Or DFCS_FLAT)
@@ -1767,7 +1771,7 @@ Private Sub DrawGrid(bRedraw As Boolean)
                     lY = RowTop(mRow)
                     If lY >= 0 Then
                         r.Right = 0
-                        If mSelectMode = Column Then
+                        If mSelectMode = Multiple Then
                             SetColRect mCol, r
                             r.Top = lY + 1
                             r.Bottom = lY + mItems(mRowPtr(mRow)).lHeight
@@ -2009,7 +2013,7 @@ Private Sub DrawRect(hdc As Long, rc As RECT, lcolor As Long, bFilled As Boolean
     '        hObject: Long, a handle to a GDI object.
     '    Return Value: Long, non-zero indicates success, zero indicates failure.
     '    Remarks:
-    '        Do not delete a pen, brush, or bitmap that is currently selected into a device context. If you delete a brush based on a bitmap (pattern brush), the bitmap itself will not be deleted by this function—only the brush will be deleted.    
+    '        Do not delete a pen, brush, or bitmap that is currently selected into a device context. If you delete a brush based on a bitmap (pattern brush), the bitmap itself will not be deleted by this function—only the brush will be deleted.
 
 End Sub
 
@@ -2679,7 +2683,7 @@ End Property
 Public Function ItemsVisible() As Long
     Dim lBorderWidth As Long
     
-    If mBorderStyle = �߿� Then lBorderWidth = 2
+    If mBorderStyle = Border Then lBorderWidth = 2
     With UserControl
         ItemsVisible = (.ScaleHeight - GetColumnHeadingHeight() - (lBorderWidth * 2)) / GetRowHeight()
     End With
@@ -3928,14 +3932,14 @@ Private Sub UserControl_InitProperties()
     
     mAlphaBlendSelection = False
     mDisplayEllipsis = True
-    mSelectMode = [��]
+    mSelectMode = Solo
     mFocusStyle = Heavy
     mGridLines = True
     mGridLineWidth = 1
     
     'Behaviour Properties
     mAllowResizing = Resize
-    mBorderStyle = �߿�
+    mBorderStyle = Border
     mCheckboxes = False
     mColumnDrag = False
     mColumnHeaders = True
@@ -4453,10 +4457,10 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
         mGridColor = .ReadProperty("GridColor", &HC0C0C0)
         
         mAlphaBlendSelection = .ReadProperty("AlphaBlendSelection", False)
-        mBorderStyle = .ReadProperty("BorderStyle", �߿�)
+        mBorderStyle = .ReadProperty("BorderStyle", Border)
         mDisplayEllipsis = .ReadProperty("DisplayEllipsis", True)
         mFocusColor = .ReadProperty("FocusColor", vbBlue)
-        mSelectMode = .ReadProperty("SelectMode", [��])
+        mSelectMode = .ReadProperty("SelectMode", Solo)
         mFocusStyle = .ReadProperty("FocusStyle", Heavy)
         mGridLines = .ReadProperty("GridLines", True)
         mGridLineWidth = .ReadProperty("GridLineWidth", 1)
@@ -4548,9 +4552,9 @@ Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
         Call .WriteProperty("GridColor", mGridColor, &HC0C0C0)
         
         Call .WriteProperty("AlphaBlendSelection", mAlphaBlendSelection, False)
-        Call .WriteProperty("BorderStyle", mBorderStyle, �߿�)
+        Call .WriteProperty("BorderStyle", mBorderStyle, Border)
         Call .WriteProperty("DisplayEllipsis", mDisplayEllipsis, True)
-        Call .WriteProperty("SelectMode", mSelectMode, [��])
+        Call .WriteProperty("SelectMode", mSelectMode, Solo)
         Call .WriteProperty("FocusColor", mFocusColor, vbBlue)
         Call .WriteProperty("FocusStyle", mFocusStyle, Heavy)
         Call .WriteProperty("GridLines", mGridLines, True)
@@ -4589,7 +4593,7 @@ Private Sub Subclass_AddMsg(ByVal lng_hWnd As Long, ByVal uMsg As Long, Optional
 End Sub
 
 Private Function Subclass_Start(ByVal lng_hWnd As Long) As Long
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim nSubIdx As Long
     Dim sSubCode As String
     
@@ -4616,11 +4620,11 @@ Private Function Subclass_Start(ByVal lng_hWnd As Long) As Long
         Hex$(&HA4 + (0 * 12)) & "070000C3"
         
         'Convert the string from hex pairs to bytes and store in the machine code buffer
-        i = 1
+        I = 1
         Do While j < 200
             j = j + 1
-            sc_aBuf(j) = CByte("&H" & Mid$(sSubCode, i, 2))                     'Convert a pair of hex characters to an eight-bit value and store in the static code buffer array
-            i = i + 2
+            sc_aBuf(j) = CByte("&H" & Mid$(sSubCode, I, 2))                     'Convert a pair of hex characters to an eight-bit value and store in the static code buffer array
+            I = I + 2
         Loop
         
         Call zPatchVal(VarPtr(sc_aBuf(1)), PATCH_0A, ObjPtr(Me))
@@ -4644,7 +4648,7 @@ Private Function Subclass_Start(ByVal lng_hWnd As Long) As Long
     
     With sc_aSubData(nSubIdx)
         .nAddrSub = GlobalAlloc(0, 200)
-        Call VirtualProtect(ByVal .nAddrSub, 200, PAGE_EXECUTE_READWRITE, i)
+        Call VirtualProtect(ByVal .nAddrSub, 200, PAGE_EXECUTE_READWRITE, I)
         Call RtlMoveMemory(ByVal .nAddrSub, sc_aBuf(1), 200)
         
         .hWnd = lng_hWnd

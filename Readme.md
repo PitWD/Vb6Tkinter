@@ -1,3 +1,5 @@
+***Do NOT use this fork during ongoing Chinese -> English translation!***
+
 # Introduction  
 
 The program is an addin for VB6, It allows you design your GUI layout of Tkinter (standard GUI library of Python) in VB6 Integrated Development Environment.

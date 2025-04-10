@@ -23,7 +23,7 @@ End Type
 ' Declare API functions
 'Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
 Public Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
-Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, lpftLastWriteTime As FILETIME) As Long
+Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, lpftLastWriteTime As Long) As Long
 Public Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 Public Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Public Const REG_SZ = 1
@@ -224,7 +224,7 @@ End Function
 
 ' Get all installed Python paths from the system registry
 Public Function GetAllInstalledPython() As String()
-    Dim nRe As Long, nHk As Long, nHk2 As Long, i As Long, nLen As Long
+    Dim nRe As Long, nHk As Long, nHk2 As Long, I As Long, nLen As Long
     Dim sVer As String, sAllPath As String, sBuff As String, sPythonExe As String
     Dim saVer() As String, nVerNum As Long
     
@@ -234,11 +234,11 @@ Public Function GetAllInstalledPython() As String()
         Exit Function
     End If
     
-    i = 0
+    I = 0
     nVerNum = 0
     nLen = 255
     sBuff = String$(255, 0)
-    Do While (RegEnumKeyEx(nHk, i, sBuff, nLen, 0, vbNullString, ByVal 0&, ByVal 0&) = 0)
+    Do While (RegEnumKeyEx(nHk, I, sBuff, nLen, 0, vbNullString, ByVal 0&, ByVal 0&) = 0)
         If nLen > 1 Then
             sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
             
@@ -246,15 +246,15 @@ Public Function GetAllInstalledPython() As String()
             saVer(nVerNum) = sBuff
             nVerNum = nVerNum + 1
         End If
-        i = i + 1
+        I = I + 1
         nLen = 255
         sBuff = String$(255, 0)
     Loop
     RegCloseKey nHk
     
     ' Query installation paths
-    For i = 1 To nVerNum
-        nRe = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore\" & saVer(i - 1) & "\InstallPath", 0, KEY_READ Or KEY_WOW64_64KEY, nHk2)
+    For I = 1 To nVerNum
+        nRe = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore\" & saVer(I - 1) & "\InstallPath", 0, KEY_READ Or KEY_WOW64_64KEY, nHk2)
         If nRe = 0 Then
             nLen = 255
             sBuff = String$(255, 0)
@@ -295,7 +295,7 @@ End Function
 
 ' Get the list of controls in the current form, returning a string with "|" as the separator
 Public Function GetAllComps() As String()
-    Dim nCnt As Long, i As Long, sa() As String
+    Dim nCnt As Long, I As Long, sa() As String
     On Error Resume Next
     nCnt = UBound(g_Comps)
     On Error GoTo 0
@@ -305,8 +305,8 @@ Public Function GetAllComps() As String()
     End If
     
     ReDim sa(nCnt) As String
-    For i = 0 To nCnt
-        sa(i) = g_Comps(i).Name & "|" & TypeName(g_Comps(i))
+    For I = 0 To nCnt
+        sa(I) = g_Comps(I).Name & "|" & TypeName(g_Comps(I))
     Next
     GetAllComps = sa
 End Function
