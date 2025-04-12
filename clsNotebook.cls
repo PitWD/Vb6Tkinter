@@ -34,15 +34,15 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
-    Dim I As Long, nTabs As Long, s As String
+    Dim i As Long, nTabs As Long, s As String
     Dim bTabExisted As Boolean, sCaption As String
     
     nTabs = IIf(m_nTabs > UBound(m_Tabs), m_nTabs, UBound(m_Tabs))
     
-    For I = 1 To nTabs  'TAB index starts from 1
-        If I > UBound(m_Tabs) Then
+    For i = 1 To nTabs  'TAB index starts from 1
+        If i > UBound(m_Tabs) Then
             bTabExisted = False
-        ElseIf m_Tabs(I) Is Nothing Then
+        ElseIf m_Tabs(i) Is Nothing Then
             bTabExisted = False
         Else
             bTabExisted = True
@@ -50,19 +50,19 @@ Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilde
         
         'Prefer to use the tab title set in TabStrip, if empty, use the title of the Frame control.
         If bTabExisted Then
-            If I > m_nTabs Then
-                sCaption = m_Tabs(I).Caption
-            ElseIf Len(m_TabTitles(I)) = 0 Then
-                sCaption = m_TTabs(I).Caption
-            ElseIf I <= m_nTabs Then
-                sCaption = m_TabTitles(I)
+            If i > m_nTabs Then
+                sCaption = m_Tabs(i).Caption
+            ElseIf Len(m_TabTitles(i)) = 0 Then
+                sCaption = m_Tabs(i).Caption
+            ElseIf i <= m_nTabs Then
+                sCaption = m_TabTitles(i)
             End If
-        ElseIf I <= m_nTabs Then
-            sCaption = m_TabTitles(I)
+        ElseIf i <= m_nTabs Then
+            sCaption = m_TabTitles(i)
         End If
-        If Len(sCaption) = 0 Then sCaption = "Tab" & I
+        If Len(sCaption) = 0 Then sCaption = "Tab" & i
         
-        CreateSingleTabWidget sOut, sCmd, sI18n, rel, usettk, I, bTabExisted, sCaption
+        CreateSingleTabWidget sOut, sCmd, sI18n, rel, usettk, i, bTabExisted, sCaption
     Next
 End Sub
 
@@ -89,7 +89,7 @@ End Sub
 
 'Call this function immediately after creating the object to initialize the parameters
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim I As Long, oiTabs As ITabs, s As String, sa() As String, idx As Long
+    Dim i As Long, oiTabs As ITabs, s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
@@ -99,8 +99,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_nTabs = oiTabs.Count
     
     ReDim m_TabTitles(m_nTabs) As String
-    For I = 1 To m_nTabs
-        m_TabTitles(I) = oiTabs.Item(I).Caption  'TAB index starts from 1
+    For i = 1 To m_nTabs
+        m_TabTitles(i) = oiTabs.Item(i).Caption  'TAB index starts from 1
     Next
     
     'These are all the default values
@@ -138,8 +138,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For I = 1 To UBound(sa)
-                s = sa(I)
+            For i = 1 To UBound(sa)
+                s = sa(i)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then 'Has value
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)

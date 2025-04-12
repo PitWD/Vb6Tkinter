@@ -10,5 +10,43 @@ PitWD:
             BeginProperty Font 
                 Name            =   "Arial"
 
+        MainForm.frm
+            lastest <-> latest - CoPilot changed variables while translating Chinese -> English
+
+    
+    STRANGE ONES
+        
+        Common.bas
+            Instead of:
+            Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" ( _
+                    ByVal hKey As Long, _
+                    ByVal dwIndex As Long, _
+                    ByVal lpName As String, _
+                    lpcbName As Long, _
+                    ByVal lpReserved As Long, _
+                    ByVal lpClass As String, _
+                    lpcbClass As Long, _
+                    lpftLastWriteTime As FILETIME) As Long
+
+            There was this (caused compile error - call of function was right with 8 instead of 7 declared parameters):
+            Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" ( _
+                    ByVal hKey As Long, _
+                    ByVal dwIndex As Long, _
+                    ByVal lpName As String, _
+                    lpcbName As Long, _
+                    ByVal lpReserved As Long, _             
+                    ByVal lpClass As Long, _                !! wrong type !! (but vbNullString in call - allowed)
+                    lpftLastWriteTime As Long) As Long      !! wrong type !! (but ByVal 0& in call - critical pointer-fuck ?!?)
+
+            What I changed to (keeping the wrong types):
+            Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" ( _
+                    ByVal hKey As Long, _
+                    ByVal dwIndex As Long, _
+                    ByVal lpName As String, _
+                    lpcbName As Long, _
+                    ByVal lpReserved As Long, _
+                    ByVal lpClass As Long, _
+                    ByVal lpcbClass As Long, _
+                    lpftLastWriteTime As Long) As Long
 
 

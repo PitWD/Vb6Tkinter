@@ -114,16 +114,16 @@ End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
-    Select Case sAttr
-    Case "length"
+    Select Case sAttr:
+    Case "length":
         Tips = Tips & L("l_TipProgresLen", "Specifies the length of the long axis of the progress bar.")
-    Case "mode"
+    Case "mode":
         Tips = Tips & L("l_TipProgresMode", "One of 'determinate' or 'indeterminate'.\n 'determinate' represents the amount of work completed.")
-    Case "maximum"
+    Case "maximum":
         Tips = Tips & L("l_TipMaximum", "A number specifying the maximum value. Defaults to 100.")
-    Case "value"
+    Case "value":
         Tips = Tips & L("l_TipProgresValue", "The current value of the progress bar.")
-    Case Else
+    Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function

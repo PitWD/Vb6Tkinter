@@ -162,18 +162,18 @@ End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
-    Select Case sAttr
-    Case "columns"
+    Select Case sAttr:
+    Case "columns":
         Tips = Tips & L("l_TipColumns", "A list of column identifiers, specifying the number of columns and their names.")
-    Case "displaycolumns"
+    Case "displaycolumns":
         Tips = Tips & L("l_TipDisplayColumns", "A list of column identifiers specifying which data columns are displayed and the order in which they appear, or the string '#all'.")
-    Case "displayrows"
+    Case "displayrows":
         Tips = Tips & L("l_TipDisplayRows", "How many rows be displayed.")
-    Case "selectmode"
+    Case "selectmode":
         Tips = Tips & L("l_TipSelectModeTV", "Controls how the built-in class bindings manage the selection.\nThey are:'extended','browse','none'")
-    Case "show"
+    Case "show":
         Tips = Tips & L("l_TipShowTV", "Specifying which elements of the tree to display.\nDefault is 'tree headings'.\nSet to 'tree' hide the heading.")
-    Case Else
+    Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function

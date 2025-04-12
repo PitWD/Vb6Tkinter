@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Vb6Tkinter https://github.com/cdhigh"
    ClientHeight    =   8130
@@ -20,7 +20,7 @@ Begin VB.Form FrmMain
    ScaleHeight     =   542
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   865
-   StartUpPosition =   2  '��Ļ����
+   StartUpPosition =   2  'Bildschirmmitte
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
       Height          =   345
@@ -38,7 +38,7 @@ Begin VB.Form FrmMain
       ItemData        =   "MainForm.frx":058E
       Left            =   6360
       List            =   "MainForm.frx":0590
-      Style           =   2  'Dropdown List
+      Style           =   2  'Dropdown-Liste
       TabIndex        =   12
       Top             =   720
       Visible         =   0   'False
@@ -64,7 +64,7 @@ Begin VB.Form FrmMain
       EndProperty
    End
    Begin MSComctlLib.StatusBar stabar 
-      Align           =   2  'Align Bottom
+      Align           =   2  'Unten ausrichten
       Height          =   377
       Left            =   0
       TabIndex        =   10
@@ -97,7 +97,7 @@ Begin VB.Form FrmMain
       ItemData        =   "MainForm.frx":0592
       Left            =   120
       List            =   "MainForm.frx":0594
-      Style           =   2  'Dropdown List
+      Style           =   2  'Dropdown-Liste
       TabIndex        =   5
       Top             =   840
       Width           =   2415
@@ -116,7 +116,7 @@ Begin VB.Form FrmMain
       Left            =   120
       Locked          =   -1  'True
       MultiLine       =   -1  'True
-      ScrollBars      =   2  'Vertical
+      ScrollBars      =   2  'Vertikal
       TabIndex        =   7
       Top             =   4920
       Width           =   2415
@@ -159,7 +159,7 @@ Begin VB.Form FrmMain
       Height          =   6855
       Left            =   8760
       MultiLine       =   -1  'True
-      ScrollBars      =   3  'Both
+      ScrollBars      =   3  'Beides
       TabIndex        =   9
       Top             =   840
       Width           =   4095
@@ -378,7 +378,7 @@ Private Sub Form_Load()
     
     ReDim m_saTmpFile(0) As String
     
-    '������֧��
+    'Multi-Language Project
     InitMultiLanguage
     
     LstCfg.Redraw = False
@@ -1595,7 +1595,7 @@ Private Sub mnuSaveAll_Click()
     sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
     
     If Len(sF) Then
-        If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '����ļ���û����չ�����Զ�����.py��չ��
+        If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  'If the filename has no extension, automatically add .py extension
         Utf8File_Write_VB sF, TxtCode.Text
     End If
     

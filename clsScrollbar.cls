@@ -128,12 +128,12 @@ End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
-    Select Case sAttr
+    Select Case sAttr:
     Case "jump"
         Tips = Tips & L("l_TipJump", "Set to 1, the callback isn't called until the user releases the mouse button.")
     Case "activerelief"
         Tips = Tips & L("l_TipActiveRelief", "To display the slider with a different relief style when the mouse is over the slider.")
-    Case Else
+    Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function

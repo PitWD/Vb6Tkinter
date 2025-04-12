@@ -107,7 +107,7 @@ Private Const BIF_RETURNONLYFSDIRS = &H1                                        
 Private Const BIF_NEWDIALOGSTYLE = &H40                                         'New style (with new folder button, resizable dialog)
 Private Const BIF_NONEWFOLDERBUTTON = &H200                                     'New style, no new folder button (resizable only)
 
-Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional bModal As Boolean, Optional ByVal InitDir As String) As String
+Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional ByVal InitDir As String, Optional bModal As Boolean = True) As String
     Dim OFN   As OPENFILENAME
     Dim r     As Long
     
@@ -288,22 +288,22 @@ Public Function CreateTempFile(Optional ByVal Prefix As String, Optional Directo
 End Function
 Public Function CreatePath(ByVal Path As String) As Boolean
     On Error GoTo Fail
-    Dim i As Integer
+    Dim I As Integer
     Dim s As String
     AddSlash Path
     Do
-        i = InStr(i + 1, Path, "\")
-        If i = 0 Then Exit Do
-        s = Left$(Path, i - 1)
+        I = InStr(I + 1, Path, "\")
+        If I = 0 Then Exit Do
+        s = Left$(Path, I - 1)
         If Not DirectoryExists(s) Then MkDir s
-    Loop Until i = Len(Path)
+    Loop Until I = Len(Path)
     
     If DirectoryExists(Path) Then
         CreatePath = True
         Exit Function
     End If
 Fail:
-    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + Path + Chr$(34), vbExclamation + vbOKOnly + vbApplicationModal, App.Title)
+    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + Path + Chr$(34), vbExclamation, App.Title + " - CreatePath Function")
     
 End Function
 

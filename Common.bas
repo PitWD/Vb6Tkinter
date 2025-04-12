@@ -23,7 +23,8 @@ End Type
 ' Declare API functions
 'Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
 Public Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
-Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, lpftLastWriteTime As Long) As Long
+Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, ByVal lpcbClass As Long, lpftLastWriteTime As FILETIME) As Long
+'Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As Long, lpftLastWriteTime As Long) As Long
 Public Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 Public Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Public Const REG_SZ = 1
@@ -224,6 +225,7 @@ End Function
 
 ' Get all installed Python paths from the system registry
 Public Function GetAllInstalledPython() As String()
+MsgBox "Wait... GetAllInstalledPython"
     Dim nRe As Long, nHk As Long, nHk2 As Long, I As Long, nLen As Long
     Dim sVer As String, sAllPath As String, sBuff As String, sPythonExe As String
     Dim saVer() As String, nVerNum As Long

@@ -179,7 +179,7 @@ Public Function Tips(sAttr As String) As String
     Case "state"
         Tips = Tips & L("l_TipStateHasRO", "State of the widget. They are 'normal', 'readonly', 'disabled'")
     Case "wrap"
-        Tips = Tips & L("l_TipWrapMode", "Controls the display of lines that are too wide.\n'CHAR':will be broken at any character.\n'WORD': will break the line after the last word that will fit.")
+        Tips = Tips & L("l_TipWrapMode", "Controls the display of lines that are too wide.\n'CHAR':will be broken at any character.\n'WORD': will break the line after the last word that will fit.\n'NONE':provide a horizontal scrollbar.")
     Case "spacing1"
         Tips = Tips & L("l_TipSpacing1", "Specifies how much extra vertical space is put above each line of text.")
     Case "spacing2"

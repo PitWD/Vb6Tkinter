@@ -31,13 +31,13 @@ End Sub
 
 Private Sub IDTExtensibility_OnAddInsUpdate(custom() As Variant)
     'Prevent the compiler from deleting the function because this interface must be implemented.
-    Dim i As Long
-    i = 1
+    Dim I As Long
+    I = 1
 End Sub
 Private Sub IDTExtensibility_OnStartupComplete(custom() As Variant)
     'Prevent the compiler from deleting the function because this interface must be implemented.
-    Dim i As Long
-    i = 1
+    Dim I As Long
+    I = 1
 End Sub
 
 Private Sub IDTExtensibility_OnConnection(ByVal VBInst As Object, ByVal ConnectMode As VBIDE.vbext_ConnectMode, ByVal AddInInst As VBIDE.AddIn, custom() As Variant)
@@ -118,7 +118,7 @@ Private Sub AddToToolBox(sCaption As String)
     
     'See if the standard toolbar can be found.
     On Error Resume Next
-    Set cbStandard = VbeInst.CommandBars("标准")
+    Set cbStandard = VbeInst.CommandBars("Standard")
     If cbStandard Is Nothing Then Set cbStandard = VbeInst.CommandBars("Standard")
     If cbStandard Is Nothing Then Set cbStandard = VbeInst.CommandBars(2)
     If cbStandard Is Nothing Then Exit Sub

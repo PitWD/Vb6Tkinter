@@ -152,23 +152,23 @@ End Function
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr
-    Case "from_"
+    Case "from_":
         Tips = Tips & L("l_TipFrom", "A float or integer value that defines one end of the scale's range.")
-    Case "to"
+    Case "to":
         Tips = Tips & L("l_TipTo", "A float or integer value that defines one end of the scale's range.")
-    Case "resolution"
+    Case "resolution":
         Tips = Tips & L("l_TipResolution", "The smallest increment of the scale's value.")
-    Case "showvalue"
+    Case "showvalue":
         Tips = Tips & L("l_TipShowValue", "The value of the scale is displayed in text form by the slider when set to 1(default).")
-    Case "digits"
+    Case "digits":
         Tips = Tips & L("l_TipDigits", "How many digits to use for display.")
-    Case "sliderlength"
+    Case "sliderlength":
         Tips = Tips & L("l_TipSliderLen", "Normally the slider is 30 pixels along the length of the scale. You can change the value.")
-    Case "sliderrelief"
+    Case "sliderrelief":
         Tips = Tips & L("l_TipSliderRelief", "Relief of the slider. They are: FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN")
-    Case "tickinterval"
+    Case "tickinterval":
         Tips = Tips & L("l_TipTickInterval", "To display periodic scale values, set this option to a number, and ticks will be displayed on multiples of that value.")
-    Case Else
+    Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function

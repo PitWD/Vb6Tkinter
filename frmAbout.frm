@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin VB.Form frmAbout 
-   BorderStyle     =   1  'Fixed Single
+   BorderStyle     =   1  'Fest Einfach
    Caption         =   "About"
    ClientHeight    =   4230
    ClientLeft      =   4755
@@ -13,7 +13,7 @@ Begin VB.Form frmAbout
    ScaleHeight     =   4230
    ScaleWidth      =   10830
    Begin VB.PictureBox picAbout 
-      BorderStyle     =   0  'None
+      BorderStyle     =   0  'Kein
       Height          =   3735
       Left            =   240
       Picture         =   "frmAbout.frx":058A
@@ -26,7 +26,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAbout2 
       Caption         =   "Visit <https://github.com/cdhigh/Vb6Tkinter> for more detailed information"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "SimSun"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -44,7 +44,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAbout1 
       Caption         =   "With Vb6Tkinter, you can create your Tkinter UI in the most intuitive way"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "SimSun"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -62,7 +62,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAboutAuthor 
       Caption         =   "Made by cdhigh"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "SimSun"
          Size            =   14.25
          Charset         =   134
          Weight          =   400
@@ -80,7 +80,7 @@ Begin VB.Form frmAbout
    Begin VB.Label lblAboutVer 
       Caption         =   "Vb6Tkinter v1.7.0"
       BeginProperty Font 
-         Name            =   "Arial"
+         Name            =   "SimSun"
          Size            =   14.25
          Charset         =   134
          Weight          =   700

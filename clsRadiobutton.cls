@@ -135,7 +135,7 @@ End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
-    Select Case sAttr
+    Select Case sAttr:
         Case "indicatoron"
             Tips = Tips & L("l_TipIndicatorOn", "Specifies if displays its indicator or not.")
         Case "value"
