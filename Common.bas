@@ -20,6 +20,11 @@ Private Type Size
     cy As Long
 End Type
 
+Public Type FILETIME
+        dwLowDateTime As Long
+        dwHighDateTime As Long
+End Type
+
 ' Declare API functions
 'Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
 Public Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
@@ -228,7 +233,8 @@ Public Function GetAllInstalledPython() As String()
 MsgBox "Wait... GetAllInstalledPython"
     Dim nRe As Long, nHk As Long, nHk2 As Long, I As Long, nLen As Long
     Dim sVer As String, sAllPath As String, sBuff As String, sPythonExe As String
-    Dim saVer() As String, nVerNum As Long
+    Dim saVer() As String, nVerNum As Long, fTime As FILETIME
+    
     
     nRe = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore", 0, KEY_READ Or KEY_WOW64_64KEY, nHk)
     If nRe <> 0 Then
@@ -240,7 +246,7 @@ MsgBox "Wait... GetAllInstalledPython"
     nVerNum = 0
     nLen = 255
     sBuff = String$(255, 0)
-    Do While (RegEnumKeyEx(nHk, I, sBuff, nLen, 0, vbNullString, ByVal 0&, ByVal 0&) = 0)
+    Do While (RegEnumKeyEx(nHk, I, sBuff, nLen, 0, vbNullString, ByVal 0&, fTime) = 0)
         If nLen > 1 Then
             sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
             
